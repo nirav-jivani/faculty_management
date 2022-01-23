@@ -1,11 +1,11 @@
 import { dashboard } from './dashboard';
 // import { utilities } from './utilities';
-import { Home } from "./Home"
-import { utilities } from './utilities';
+import { Events } from "./Events"
+import { Publications } from './Publications';
 //-----------------------|| MENU ITEMS ||-----------------------//
 
 const menuItems = {
-    items: [Home, utilities]
+    items: [Events, Publications]
 };
 
 export default menuItems;

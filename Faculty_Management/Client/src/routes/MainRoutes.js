@@ -19,7 +19,7 @@ const UtilsTablerIcons = Loadable(lazy(() => import('../views/utilities/TablerIc
 const cards = Loadable(lazy(() => import('../views/utilities/cards')));
 
 // sample page routing
-const SamplePage = Loadable(lazy(() => import('../views/sample-page')));
+const EventConducted = Loadable(lazy(() => import('../views/events/event-conducted/EventConducted')));
 const Home = Loadable(lazy(() => import('../views/Home')));
 
 //-----------------------|| MAIN ROUTING ||-----------------------//
@@ -40,7 +40,7 @@ const MainRoutes = () => {
                 '/icons/material-icons',
                 '/icons/cards',
 
-                '/sample-page'
+                '/events/event-conducted'
             ]}
         >
             <MainLayout>
@@ -56,7 +56,7 @@ const MainRoutes = () => {
                     <Route path="/icons/form_elements" component={form_elements} />
                     <Route path="/icons/cards" component={cards} />
 
-                    <Route path="/sample-page" component={SamplePage} />
+                    <Route path="/events/event-conducted" component={EventConducted} />
                     <Route path="/home/index" component={Home} />
                     {/* </AuthGuard> */}
                 </Switch>

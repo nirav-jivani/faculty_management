@@ -1,8 +1,9 @@
 // assets
-import { IconBrandFramer, IconTypography, IconPalette, IconShadow, IconWindmill, IconLayoutGridAdd } from '@tabler/icons';
+import { IconCalendarEvent,IconBrandFramer, IconTypography, IconPalette, IconShadow, IconWindmill, IconLayoutGridAdd } from '@tabler/icons';
 
 // constant
 const icons = {
+    IconCalendarEvent : IconCalendarEvent,
     IconTypography: IconTypography,
     IconPalette: IconPalette,
     IconShadow: IconShadow,
@@ -10,12 +11,11 @@ const icons = {
     IconBrandFramer: IconBrandFramer,
     IconLayoutGridAdd: IconLayoutGridAdd
 };
-
 //-----------------------|| UTILITIES MENU ITEMS ||-----------------------//
 
-export const utilities = {
-    id: 'utilities',
-    title: 'Utilities',
+export const Publications = {
+    id: 'publications',
+    title: 'Publications',
     type: 'group',
     children: [
         {
