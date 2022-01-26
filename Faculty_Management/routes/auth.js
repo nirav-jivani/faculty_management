@@ -5,6 +5,7 @@ const db = require("../database");
 const authenticateUser = require("../middlewares/validate");
 
 router.post("/login", async (req, res) => {
+  const data = { success: true, msg: "Invalid Email/Password" };
   const { email, password } = req.body;
   if (email && password) {
     const user = await db
@@ -13,10 +14,13 @@ router.post("/login", async (req, res) => {
         `SELECT * FROM faculty_info WHERE Email='${email}' and Password = '${password}'`
       );
     if (user[0].length > 0) {
-      const token = jwt.sign({ user : user[0] }, "my_secret_key");
-      res.json({user: user[0], success: true, token: token});
-    } else res.status(500).json({ success: false, msg : "Invalid Email/Password" });
-  } else res.status(500).json({ success: false });
+      const token = jwt.sign({ user: user[0] }, "my_secret_key");
+      data.user = user[0];
+      data.token = token;
+      data.msg = "";
+      res.json(data);
+    } else res.status(500).json(data);
+  } else res.status(500).json(data);
 });
 
 router.get("/check", authenticateUser, (req, res) => {

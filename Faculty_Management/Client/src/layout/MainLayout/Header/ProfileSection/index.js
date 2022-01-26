@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import configData from '../../../../config';
-
+import { useHistory } from 'react-router-dom';
 // material-ui
 import { makeStyles, useTheme } from '@material-ui/styles';
 import {
@@ -131,22 +131,25 @@ const ProfileSection = () => {
 
     const [open, setOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
-    const handleLogout = () => {
-        console.log(account.token);
-        axios
-            .post(configData.API_SERVER + 'users/logout', { token: `${account.token}` }, { headers: { Authorization: `${account.token}` } })
-            .then(function (response) {
 
-                // Force the LOGOUT
-                //if (response.data.success) {
-                dispatcher({ type: LOGOUT });
-                //} else {
-                //    console.log('response - ', response.data.msg);
-                //}
-            })
-            .catch(function (error) {
-                console.log('error - ', error);
-            });
+    const nav = useHistory();
+    const handleLogout = () => {
+        //console.log(account.token);
+        dispatcher({ type: LOGOUT });
+        nav.push('/login');
+        // axios
+        //     .post(configData.API_SERVER + 'users/logout', { token: `${account.token}` }, { headers: { Authorization: `${account.token}` } })
+        //     .then(function (response) {
+        //         // Force the LOGOUT
+        //         //if (response.data.success) {
+        //         dispatcher({ type: LOGOUT });
+        //         //} else {
+        //         //    console.log('response - ', response.data.msg);
+        //         //}
+        //     })
+        //     .catch(function (error) {
+        //         console.log('error - ', error);
+        //     });
     };
     const handleToggle = () => {
         setOpen((prevOpen) => !prevOpen);
@@ -217,7 +220,7 @@ const ProfileSection = () => {
                                             <Grid item className={classes.flex}>
                                                 <Typography variant="h4">Welcome,</Typography>
                                                 <Typography component="span" variant="h4" className={classes.name}>
-                                                    Rikin Jenil Keval
+                                                    User
                                                 </Typography>
                                             </Grid>
                                             <Grid item>
