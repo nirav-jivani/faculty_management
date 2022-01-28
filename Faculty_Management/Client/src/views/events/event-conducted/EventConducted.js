@@ -7,7 +7,9 @@ import MuiTypography from '@material-ui/core/Typography';
 import SubCard from './../../../ui-component/cards/SubCard';
 import MainCard from './../../../ui-component/cards/MainCard';
 import { gridSpacing } from './../../../store/constant';
-import WorkshopForm from './../forms/FDPForm';
+// import EventForm from './../forms/EventForm';
+import FDPForm from './../forms/FDPForm';
+
 //==============================|| TYPOGRAPHY ||==============================//
 
 const EventConducted = () => {
@@ -26,7 +28,7 @@ const EventConducted = () => {
                 </Button>
             }
         >
-            {showForm && <WorkshopForm />}
+            {showForm && <FDPForm />}
             {!showForm && (
                 <Grid container spacing={gridSpacing}>
                     <Grid item xs={12} sm={6}>

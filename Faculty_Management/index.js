@@ -5,6 +5,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ extended: false }));
 app.use("/api/users", require("./routes/auth"));
+app.use("/api/events", require("./routes/events"));
 
 app.get("/", (req, res) => res.send("API Running"));
 
