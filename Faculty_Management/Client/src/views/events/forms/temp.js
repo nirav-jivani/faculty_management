@@ -1,88 +1,4 @@
-import React from 'react';
 
-// material-ui
-import { makeStyles } from '@material-ui/styles';
-import {
-    Card,
-    Box,
-    TextField,
-    MenuItem,
-    FormControl,
-    Radio,
-    RadioGroup,
-    FormLabel,
-    FormControlLabel,
-    Switch,
-    FormGroup,
-    Stack,
-    Button,
-    Checkbox
-} from '@material-ui/core';
-
-// import { Fab, AddIcon, EditIcon, FavoriteIcon, NavigationIcon } from '@material-ui/material';
-
-// project imports
-//import MainCard from './../../ui-component/cards/MainCard';
-import SecondaryAction from './../../../ui-component/cards/CardSecondaryAction';
-
-// style constant
-const useStyles = makeStyles((theme) => ({
-    frame: {
-        height: 'calc(100vh - 210px)',
-        border: '1px solid',
-        borderColor: theme.palette.primary.light
-    }
-}));
-
-//=============================|| Sample Form ||=============================//
-const currencies = [
-    {
-        value: 'CE',
-        label: 'Computer Engineering'
-    },
-    {
-        value: 'IT',
-        label: 'Information Technology'
-    },
-    {
-        value: 'EC',
-        label: 'Electronics & Communication'
-    }
-];
-
-const WorkshopForm = () => {
-    const classes = useStyles();
-    const [currency, setCurrency] = React.useState('CE');
-    const handleChange = (event) => {
-        setCurrency(event.target.value);
-    };
-
-    const [value, setValue] = React.useState('female');
-    const [switchBtn, setSwitchBtnValue] = React.useState(true);
-    const [radio, setRadioValue] = React.useState('');
-
-    const handleChange2 = (event) => {
-        setSwitchBtnValue(!switchBtn);
-        console.log(switchBtn);
-    };
-    const handleChange3 = (event) => {
-        console.log(event.target.checked);
-        console.log(event.target.value);
-        if (event.target.checked) {
-            setRadioValue(event.target.value);
-        }
-        console.log(radio);
-    };
-    const handleChange1 = (event) => {
-        setValue(event.target.value);
-        console.log(value);
-    };
-    return (
-        <>
-            <TextField fullWidth label="Full Name" id="fullWidth" helperText="Enter your full name with surname and father's name" />
-            <br />
-            <br />
-            <br />
             <TextField fullWidth id="outlined-select-currency" select label="Select Branch" value={currency} onChange={handleChange}>
                 {currencies.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -100,11 +16,9 @@ const WorkshopForm = () => {
                     <FormControlLabel value="male" control={<Radio />} label="Male" />
                 </RadioGroup>
             </FormControl>
-
             <FormGroup>
                 <FormControlLabel onChange={handleChange2} control={<Switch defaultChecked />} label="Checked" />
             </FormGroup>
-
             <br />
             <br />
             <br />
@@ -124,7 +38,6 @@ const WorkshopForm = () => {
                 <FormControlLabel value="Keval" control={<Checkbox />} label="Keval" />
                 <FormControlLabel value="Gandevia" control={<Checkbox />} label="Gandevia" />
             </FormGroup>
-
             <br />
             <br />
             <br />
@@ -143,8 +56,3 @@ const WorkshopForm = () => {
             <Button variant="contained" fullWidth size="large">
                 Contained
             </Button>
-        </>
-    );
-};
-
-export default WorkshopForm;

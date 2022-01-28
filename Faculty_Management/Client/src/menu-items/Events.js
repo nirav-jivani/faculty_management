@@ -3,7 +3,7 @@ import { IconCalendarEvent, IconDashboard, IconDeviceAnalytics } from '@tabler/i
 
 // constant
 const icons = {
-    IconCalendarEvent : IconCalendarEvent,
+    IconCalendarEvent: IconCalendarEvent,
     IconDashboard: IconDashboard,
     IconDeviceAnalytics
 };
@@ -20,14 +20,28 @@ export const Events = {
             title: 'Event Conducted',
             type: 'collapse',
             icon: icons['IconCalendarEvent'],
-            children : [
+            children: [
                 {
-                    id: 'workshop',
-                    title: 'Workshop',
+                    id: 'FDP',
+                    title: 'FDP',
                     type: 'item',
                     url: '/events/event-conducted',
                     breadcrumbs: false
                 },
+                {
+                    id: 'Expert_Lectures',
+                    title: 'Expert_Lectures',
+                    type: 'item',
+                    url: '/events/event-conducted',
+                    breadcrumbs: false
+                },
+                {
+                    id: 'Seminars',
+                    title: 'Seminars',
+                    type: 'item',
+                    url: '/events/event-conducted',
+                    breadcrumbs: false
+                }
             ]
         },
         {
@@ -35,18 +49,14 @@ export const Events = {
             title: 'Event Organized',
             type: 'collapse',
             icon: icons['IconCalendarEvent'],
-            children : [
-                
-            ]
+            children: []
         },
         {
             id: 'event-attended',
             title: 'Event Attended',
             type: 'collapse',
             icon: icons['IconCalendarEvent'],
-            children : [
-                
-            ]
-        },
+            children: []
+        }
     ]
 };

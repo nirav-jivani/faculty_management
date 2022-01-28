@@ -7,19 +7,19 @@ import MuiTypography from '@material-ui/core/Typography';
 import SubCard from './../../../ui-component/cards/SubCard';
 import MainCard from './../../../ui-component/cards/MainCard';
 import { gridSpacing } from './../../../store/constant';
-import WorkshopForm from './../forms/WorkshopForm';
+import WorkshopForm from './../forms/FDPForm';
 //==============================|| TYPOGRAPHY ||==============================//
 
 const EventConducted = () => {
     const [showForm, setShowForm] = useState(false);
-    const [btnText, setBtnText] = useState('Add Workshop');
+    const [btnText, setBtnText] = useState('Add FDP');
     const handleOnClick = () => {
-        showForm === true ? setBtnText('Add Workshop') : setBtnText('Show Workshops');
+        showForm === true ? setBtnText('Add FDP') : setBtnText('Show FDP');
         setShowForm(!showForm);
     };
     return (
         <MainCard
-            title="Workshops Conducted"
+            title="FDP Conducted"
             secondary={
                 <Button onClick={handleOnClick} variant="contained" fullWidth size="small">
                     {btnText}
