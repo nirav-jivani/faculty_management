@@ -172,13 +172,12 @@ const EarningCard = ({ isLoading }) => {
                         <Grid item>
                             <Grid container alignItems="center">
                                 <Grid item>
-                                    <Typography className={classes.cardHeading}>Jenil J Gandhi</Typography>
+                                    <Typography className={classes.cardHeading}>Nirav Jivani</Typography>
                                 </Grid>
-
                             </Grid>
                         </Grid>
                         <Grid item sx={{ mb: 1.25 }}>
-                            <Typography className={classes.subHeading}>19ceuon133@ddu.ac.in</Typography>
+                            <Typography className={classes.subHeading}>9828XXXXXX</Typography>
                         </Grid>
                     </Grid>
                 </MainCard>

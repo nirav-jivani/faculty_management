@@ -10,9 +10,10 @@ router.post("/login", async (req, res) => {
   if (email && password) {
     const user = await db
       .promise()
-      .query(
-        `SELECT * FROM faculty_info WHERE Email='${email}' and Password = '${password}'`
-      );
+      .query(`SELECT * FROM faculties WHERE Username=? and Password = ?`, [
+        email,
+        password,
+      ]);
     if (user[0].length > 0) {
       const token = jwt.sign({ user: user[0] }, "my_secret_key");
       data.user = user[0];

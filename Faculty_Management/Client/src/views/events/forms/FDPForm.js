@@ -1,9 +1,8 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-
+import { format } from 'date-fns';
 import axios from 'axios';
 import configData from '../../../config';
-
 
 // material-ui
 import { makeStyles } from '@material-ui/styles';
@@ -37,68 +36,55 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-//=============================|| Sample Form ||=============================//
+//=============================: Sample Form :=============================//
 
-const WorkshopForm = () => {
+const WorkshopForm = (props) => {
     // const classes = useStyles();
+    const passData = props.passData;
     const account = useSelector((state) => state.account);
     const [data, setData] = React.useState({
-        fact_id: account.user.Id,
-        title: '',
-        factName: '',
-        organizedBy: '',
-        organizedAt: '',
-        approvedBy: '',
-        mode: 'Online',
-        type: 'FDP',
-        other: '',
-        fromDate: '',
-        toDate: '',
-        duration: '',
-        academicYear: '',
-        filePath: ''
+        id: passData ? passData.id : '',
+        title: passData ? passData.title : '',
+        factName: passData ? passData.speaker_name : '',
+        organizedBy: passData ? passData.organization_name : '',
+        organizedAt: passData ? passData.venue : '',
+        approvedBy: passData ? passData.approved_by : '',
+        mode: passData ? passData.mode : 'Online',
+        type: passData ? passData.event_type : 'FDP',
+        other: passData ? passData.other_type : '',
+        participants: passData ? passData.participants : '',
+        fromDate: passData ? format(new Date(passData.from_date), 'yyyy-MM-dd') : '',
+        toDate: passData ? format(new Date(passData.to_date), 'yyyy-MM-dd') : '',
+        duration: passData ? passData.duration : '',
+        academicYear: passData ? passData.academic_year : '',
+        file: null
     });
 
-    // const [mode, setMode] = React.useState('Online');
-    // const [switchBtn, setSwitchBtnValue] = React.useState(true);
-    // const [radio, setRadioValue] = React.useState('');
-
-    // const handleChange2 = (event) => {
-    //     setSwitchBtnValue(!switchBtn);
-    //     console.log(switchBtn);
-    // };
-    // const handleChange3 = (event) => {
-    //     console.log(event.target.checked);
-    //     console.log(event.target.value);
-    //     if (event.target.checked) {
-    //         setRadioValue(event.target.value);
-    //     }
-    //     console.log(radio);
-    // };
-
     const handleOnChange = (event) => {
+        // if (event.target.name === 'file') {
+        //     setData({ ...data, [event.target.name]: event.target.files[0] });
+        // } else {
         setData({ ...data, [event.target.name]: event.target.value });
+        // }
     };
 
     const handleOnClick = (event) => {
         event.preventDefault();
-        axios({
-            method: 'post', //you can set what request you want to be
-            url: configData.API_SERVER + 'events/add-event',
-            data: data,
-            headers: {
-              'x-auth-token': account.token
-            }
-          })
-        // axios
-        //     .post(configData.API_SERVER + 'events/add-event', data, { 'x-auth-token' : account.token})
-        //     .then(response => {
-        //         console.log(response);
-        //     })
-        //     .catch(err => {
-        //         console.log(err);
-        //     });
-    }
+
+        // const formData = new FormData();
+        // formData.append('File', data.file);
+        axios
+            .post(configData.API_SERVER + 'events/add-event', data, {
+                headers: { 'x-auth-token': account.token }
+            })
+            .then((response) => {
+                console.log(response);
+                props.changeFunc();
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     return (
         <>
@@ -114,11 +100,26 @@ const WorkshopForm = () => {
             <br />
             <br />
             <br />
-            <TextField fullWidth label="Organized at" multiline rows={4} variant="outlined" name="organizedAt" value={data.organizedAt} onChange={handleOnChange} />
+            <TextField
+                fullWidth
+                label="Organized at"
+                multiline
+                rows={4}
+                variant="outlined"
+                name="organizedAt"
+                value={data.organizedAt}
+                onChange={handleOnChange}
+            />
             <br />
             <br />
             <br />
-            <TextField fullWidth label="Programme approved/sponsored by" name="approvedBy" value={data.approvedBy} onChange={handleOnChange} />
+            <TextField
+                fullWidth
+                label="Programme approved/sponsored by"
+                name="approvedBy"
+                value={data.approvedBy}
+                onChange={handleOnChange}
+            />
             <br />
             <br />
             <br />
@@ -145,15 +146,35 @@ const WorkshopForm = () => {
             <br />
             <br />
             <br />
-            <TextField fullWidth label="Type of programme if other than FDP/STTP/Workshop/Seminar" name="other" value={data.other} onChange={handleOnChange} />
+            <TextField
+                fullWidth
+                label="Type of programme if other than FDP/STTP/Workshop/Seminar"
+                name="other"
+                value={data.other}
+                onChange={handleOnChange}
+            />
             <br />
             <br />
             <br />
-            <TextField label="From date" InputLabelProps={{ shrink: true }} type="date" name="fromDate" value={data.fromDate} onChange={handleOnChange} />
+            <TextField
+                label="From date"
+                InputLabelProps={{ shrink: true }}
+                type="date"
+                name="fromDate"
+                value={data.fromDate}
+                onChange={handleOnChange}
+            />
             <br />
             <br />
             <br />
-            <TextField label="To date" InputLabelProps={{ shrink: true }} type="date" name="toDate" value={data.toDate} onChange={handleOnChange} />
+            <TextField
+                label="To date"
+                InputLabelProps={{ shrink: true }}
+                type="date"
+                name="toDate"
+                value={data.toDate}
+                onChange={handleOnChange}
+            />
             <br />
             <br />
             <br />
@@ -161,16 +182,29 @@ const WorkshopForm = () => {
             <br />
             <br />
             <br />
+
+            <TextField fullWidth label="Total Participants" name="participants" value={data.participants} onChange={handleOnChange} />
+            <br />
+            <br />
+            <br />
+
             <TextField fullWidth label="Academic year" name="academicYear" value={data.academicYear} onChange={handleOnChange} />
             <br />
             <br />
             <br />
-            <TextField fullWidth label="Scanned Copy of Certificate" InputLabelProps={{ shrink: true }} type="file" />
+            <TextField
+                fullWidth
+                label="Scanned Copy of Certificate"
+                name="file"
+                InputLabelProps={{ shrink: true }}
+                onChange={handleOnChange}
+                type="file"
+            />
             <br />
             <br />
             <br />
             <Button variant="contained" fullWidth size="large" onClick={handleOnClick}>
-                Submit
+                {passData ? 'Update' : 'Submit'}
             </Button>
         </>
     );

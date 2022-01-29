@@ -22,26 +22,26 @@ export const Events = {
             icon: icons['IconCalendarEvent'],
             children: [
                 {
-                    id: 'FDP',
-                    title: 'FDP',
-                    type: 'item',
-                    url: '/events/event-conducted',
-                    breadcrumbs: false
-                },
-                {
-                    id: 'Expert_Lectures',
-                    title: 'Expert_Lectures',
-                    type: 'item',
-                    url: '/events/event-conducted',
-                    breadcrumbs: false
-                },
-                {
-                    id: 'Seminars',
-                    title: 'Seminars',
+                    id: 'Event',
+                    title: 'View Events',
                     type: 'item',
                     url: '/events/event-conducted',
                     breadcrumbs: false
                 }
+                // {
+                //     id: 'Expert_Lectures',
+                //     title: 'Expert_Lectures',
+                //     type: 'item',
+                //     url: '/events/event-conducted',
+                //     breadcrumbs: false
+                // },
+                // {
+                //     id: 'Seminars',
+                //     title: 'Seminars',
+                //     type: 'item',
+                //     url: '/events/event-conducted',
+                //     breadcrumbs: false
+                // }
             ]
         },
         {

@@ -15,10 +15,10 @@ export const dashboard = {
     type: 'group',
     children: [
         {
-            id: 'default',
-            title: 'Dashboard',
+            id: 'home',
+            title: 'Home',
             type: 'item',
-            url: '/dashboard/default',
+            url: '/Home/index',
             icon: icons['IconDashboard'],
             breadcrumbs: false
         }

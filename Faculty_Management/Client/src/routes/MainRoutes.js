@@ -20,6 +20,10 @@ const cards = Loadable(lazy(() => import('../views/utilities/cards')));
 
 // sample page routing
 const EventConducted = Loadable(lazy(() => import('../views/events/event-conducted/EventConducted')));
+
+const AddFaculty = Loadable(lazy(() => import('../views/admin/AddFaculty')));
+
+const ViewFaculties = Loadable(lazy(() => import('../views/admin/ViewFaculties')));
 const Home = Loadable(lazy(() => import('../views/Home')));
 
 //-----------------------|| MAIN ROUTING ||-----------------------//
@@ -39,7 +43,9 @@ const MainRoutes = () => {
                 '/icons/form_elements',
                 '/icons/material-icons',
                 '/icons/cards',
+                '/admin/add-faculty',
 
+                '/admin/view-faculties',
                 '/events/event-conducted'
             ]}
         >
@@ -55,6 +61,9 @@ const MainRoutes = () => {
                     <Route path="/icons/material-icons" component={UtilsMaterialIcons} />
                     <Route path="/icons/form_elements" component={form_elements} />
                     <Route path="/icons/cards" component={cards} />
+
+                    <Route path="/admin/add-faculty" component={AddFaculty} />
+                    <Route path="/admin/view-faculties" component={ViewFaculties} />
 
                     <Route path="/events/event-conducted" component={EventConducted} />
                     <Route path="/home/index" component={Home} />
