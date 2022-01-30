@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 // material-ui
 import { Grid } from '@material-ui/core';
 
@@ -15,14 +14,8 @@ import { gridSpacing } from './../../../store/constant';
 
 //-----------------------|| DEFAULT DASHBOARD ||-----------------------//
 const Dashboard = () => {
-    const nav = useHistory();
-    const account = useSelector((state) => state.account);
     const [isLoading, setLoading] = useState(true);
     useEffect(() => {
-        if (account.isLoggedIn === false) {
-            //console.log(temp.isLoggedIn);
-            nav.push('/login');
-        }
         setLoading(false);
     }, []);
     return (

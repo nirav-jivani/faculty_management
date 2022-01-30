@@ -51,23 +51,23 @@ const MainRoutes = () => {
         >
             <MainLayout>
                 <Switch location={location} key={location.pathname}>
-                    {/* <AuthGuard> */}
-                    <Route path="/dashboard/default" component={DashboardDefault} />
+                    <AuthGuard>
+                        <Route path="/dashboard/default" component={DashboardDefault} />
 
-                    <Route path="/utils/util-typography" component={UtilsTypography} />
-                    <Route path="/utils/util-color" component={UtilsColor} />
-                    <Route path="/utils/util-shadow" component={UtilsShadow} />
-                    <Route path="/icons/tabler-icons" component={UtilsTablerIcons} />
-                    <Route path="/icons/material-icons" component={UtilsMaterialIcons} />
-                    <Route path="/icons/form_elements" component={form_elements} />
-                    <Route path="/icons/cards" component={cards} />
+                        <Route path="/utils/util-typography" component={UtilsTypography} />
+                        <Route path="/utils/util-color" component={UtilsColor} />
+                        <Route path="/utils/util-shadow" component={UtilsShadow} />
+                        <Route path="/icons/tabler-icons" component={UtilsTablerIcons} />
+                        <Route path="/icons/material-icons" component={UtilsMaterialIcons} />
+                        <Route path="/icons/form_elements" component={form_elements} />
+                        <Route path="/icons/cards" component={cards} />
 
-                    <Route path="/admin/add-faculty" component={AddFaculty} />
-                    <Route path="/admin/view-faculties" component={ViewFaculties} />
+                        <Route path="/admin/add-faculty" component={AddFaculty} />
+                        <Route path="/admin/view-faculties" component={ViewFaculties} />
 
-                    <Route path="/events/event-conducted" component={EventConducted} />
-                    <Route path="/home/index" component={Home} />
-                    {/* </AuthGuard> */}
+                        <Route path="/events/event-conducted" component={EventConducted} />
+                        <Route path="/home/index" component={Home} />
+                    </AuthGuard>
                 </Switch>
             </MainLayout>
         </Route>

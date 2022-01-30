@@ -1,286 +1,250 @@
-import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { useState } from 'react';
-import { useHistory } from 'react-router';
+import { React, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { format } from 'date-fns';
 // material-ui
-import { useTheme } from '@material-ui/core';
-import { TextField } from '@material-ui/core';
-import { Divider, Grid, Stack, Typography, useMediaQuery } from '@material-ui/core';
-import { Button } from '@material-ui/core';
-import { Switch } from '@material-ui/core';
-import { FormGroup } from '@material-ui/core';
-import { Radio, RadioGroup } from '@material-ui/core';
-import { FormControlLabel, FormControl, FormLabel } from '@material-ui/core';
-// // project imports
-// import AuthWrapper1 from './../AuthWrapper1';
-// import AuthCardWrapper from './../AuthCardWrapper';
-import MainCard from '../../ui-component/cards/MainCard';
-import AuthFooter from './../../ui-component/cards/AuthFooter';
+import { makeStyles } from '@material-ui/styles';
 
-// assets
+import {
+    Box,
+    TextField,
+    MenuItem,
+    Button,
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    FormHelperText,
+    IconButton,
+    InputAdornment,
+    InputLabel,
+    OutlinedInput,
+    Stack,
+    Typography
+} from '@material-ui/core';
 
-//===============================|| AUTH3 - REGISTER ||===============================//
-const axios = require('axios');
-function Register() {
-    const [mode, setMode] = useState(true);
-    const [file, setFile] = useState(null);
-    const theme = useTheme();
-    const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
-    const history = useHistory();
-    const [user, setUser] = useState({
-        firstname: '',
-        middlename: '',
-        lastname: '',
-        yoe: '',
-        username: '',
-        password: '',
-        joindate: '',
-        birthdate: '',
-        leavedate: '',
-        gender: '',
-        userType: '',
-        initials: ''
-    });
-    function HandleInput(e) {
-        // document.getElementById("error").hidden=true;
-        let name = e.target.name;
-        let value = e.target.value;
-        setUser({ ...user, [name]: value });
-    }
-    async function Register_Clicked(e) {
-        console.log('aayo');
-        e.preventDefault();
-        let fetched = await axios.post('/register', user);
-        console.log(fetched);
-        if (fetched.status === 201) {
-            document.getElementById('error_grid').hidden = false;
-        } else if (fetched.data.message === 'Success') {
-            localStorage.setItem('userData', JSON.stringify(fetched.data.user));
-            history.replace('/Home/index');
-        } else {
-            console.log(fetched.data.user);
-            localStorage.setItem('userData', JSON.stringify(fetched.data.user));
-            history.push('/dashboard/default');
+// third party
+import * as Yup from 'yup';
+import { Formik } from 'formik';
+import axios from 'axios';
+
+// project imports
+import MainCard from './../../ui-component/cards/MainCard';
+import configData from '../../config';
+import useScriptRef from '../../hooks/useScriptRef';
+
+// style constant
+const useStyles = makeStyles((theme) => ({
+    redButton: {
+        fontSize: '1rem',
+        fontWeight: 500,
+        backgroundColor: theme.palette.grey[50],
+        border: '1px solid',
+        borderColor: theme.palette.grey[100],
+        color: theme.palette.grey[700],
+        textTransform: 'none',
+        '&:hover': {
+            backgroundColor: theme.palette.primary.light
+        },
+        [theme.breakpoints.down('sm')]: {
+            fontSize: '0.875rem'
         }
+    },
+    signDivider: {
+        flexGrow: 1
+    },
+    signText: {
+        cursor: 'unset',
+        margin: theme.spacing(2),
+        padding: '5px 56px',
+        borderColor: theme.palette.grey[100] + ' !important',
+        color: theme.palette.grey[900] + '!important',
+        fontWeight: 500
+    },
+    loginIcon: {
+        marginRight: '16px',
+        [theme.breakpoints.down('sm')]: {
+            marginRight: '8px'
+        }
+    },
+    loginInput: {
+        ...theme.typography.customInput
     }
-    function Mode_Change(e) {
-        setMode(!mode);
-    }
-    function fileUpload(e) {
-        setFile(e.target.files[0]);
-        console.log(file);
-    }
-    async function Register_Clicked_File(e) {
-        e.preventDefault();
-        let formData = new FormData();
-        formData.append('file', file);
-        formData.append('data', 'jaydev');
-        console.log(file);
-        console.log(formData);
-        let fetched = await axios.post('/registerEmployeesUsingFile', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
+}));
+
+//============================|| API JWT - LOGIN ||============================//
+
+const AddFaculty = (props, { ...others }) => {
+    const classes = useStyles();
+
+    const scriptedRef = useScriptRef();
+
+    const account = useSelector((state) => state.account);
+    const [deptList, setDeptList] = useState([]);
+    useEffect(() => {
+        axios.get(configData.API_SERVER + 'admin/get-departments', { headers: { 'x-auth-token': account.token } }).then((response) => {
+            if (response.data.success) {
+                setDeptList(response.data.deptList);
+                console.log(deptList);
+            }
         });
-        if (fetched.data.message != null) {
-            console.log('success');
-        } else {
-            history.push('/home/index');
-        }
-    }
+    }, []);
+
     return (
-        <MainCard title="Register Employees">
-            <Grid xs={12} display={'flex'} justifyContent={'flex-end'}>
-                <FormGroup>
-                    <FormControlLabel control={<Switch defaultChecked onChange={Mode_Change} />} label="Manually" />
-                </FormGroup>
-            </Grid>
-            {mode && (
-                <>
-                    <div>
-                        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Grid item xs={6}>
-                                <TextField
-                                    name="username"
-                                    InputLabelProps={{ required: true }}
-                                    onChange={HandleInput}
-                                    InputProps={{ style: { fontSize: 20, width: '98%' } }}
-                                    label="Email"
-                                    fullWidth
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    fullWidth
-                                    name="password"
-                                    onChange={HandleInput}
-                                    type={'password'}
-                                    InputProps={{ style: { fontSize: 20 } }}
-                                    label="Password"
-                                    fullWidth
-                                    id="fullWidth"
-                                />
-                            </Grid>
-                        </Grid>
-                        <br />
+        <MainCard title="Add Faculty">
+            <Formik
+                initialValues={{
+                    email: '',
+                    joinDate: format(new Date(), 'yyyy-MM-dd'),
+                    dept: ''
+                }}
+                validationSchema={Yup.object().shape({
+                    email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+                    joinDate: Yup.string().max(255).required('Join Date is required')
+                })}
+                onSubmit={(values, { setErrors, setStatus, setSubmitting }) => {
+                    try {
+                        axios
+                            .post(
+                                configData.API_SERVER + 'admin/add-faculty',
+                                {
+                                    joinDate: values.joinDate,
+                                    email: values.email,
+                                    dept: values.dept
+                                },
+                                { headers: { 'x-auth-token': account.token } }
+                            )
+                            .then(function (response) {
+                                if (response.data.success) {
+                                    console.log('success');
+                                    if (scriptedRef.current) {
+                                        setStatus({ success: true });
+                                        setSubmitting(false);
+                                    }
+                                } else {
+                                    setStatus({ success: false });
+                                    setErrors({ submit: response.data.msg });
+                                    setSubmitting(false);
+                                }
+                            })
+                            .catch(function (error) {
+                                setStatus({ success: false });
+                                setErrors({ submit: error.response.data.msg });
+                                setSubmitting(false);
+                            });
+                    } catch (err) {
+                        console.error(err);
+                        if (scriptedRef.current) {
+                            setStatus({ success: false });
+                            setErrors({ submit: err.message });
+                            setSubmitting(false);
+                        }
+                    }
+                }}
+            >
+                {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
+                    <form noValidate onSubmit={handleSubmit} {...others}>
+                        <FormControl fullWidth error={Boolean(touched.email && errors.email)} className={classes.loginInput}>
+                            <InputLabel htmlFor="outlined-adornment-email-login">Email</InputLabel>
+                            <OutlinedInput
+                                id="outlined-adornment-email-login"
+                                type="email"
+                                value={values.email}
+                                name="email"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                label="Email Address"
+                                inputProps={{
+                                    classes: {
+                                        className: classes.placeHolder,
+                                        notchedOutline: classes.notchedOutline
+                                    }
+                                }}
+                            />
+                            {touched.email && errors.email && (
+                                <FormHelperText error id="standard-weight-helper-text-email-login">
+                                    {' '}
+                                    {errors.email}{' '}
+                                </FormHelperText>
+                            )}
+                        </FormControl>
 
-                        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Grid item xs={4}>
-                                <TextField
-                                    name="firstname"
-                                    InputLabelProps={{ required: true }}
-                                    onChange={HandleInput}
-                                    InputProps={{ style: { fontSize: 20, width: '98%' } }}
-                                    label="Firstname"
-                                    fullWidth
-                                />
-                            </Grid>
-                            <Grid item xs={4}>
-                                <TextField
-                                    name="middlename"
-                                    onChange={HandleInput}
-                                    InputProps={{ style: { fontSize: 20, width: '98%' } }}
-                                    label="Middlename"
-                                    fullWidth
-                                />
-                            </Grid>
-                            <Grid item xs={4}>
-                                <TextField
-                                    name="lastname"
-                                    InputLabelProps={{ required: true }}
-                                    onChange={HandleInput}
-                                    InputProps={{ style: { fontSize: 20 } }}
-                                    label="Lastname"
-                                    fullWidth
-                                />
-                                <br />
-                                <br />
-                            </Grid>
-                        </Grid>
+                        <TextField
+                            select
+                            InputLabelProps={{ shrink: true }}
+                            id="dept"
+                            value={values.dept}
+                            name="dept"
+                            label="Branch"
+                            fullWidth
+                            margin="normal"
+                            onBlur={handleBlur}
+                            onChange={handleChange}
+                            inputProps={{
+                                classes: {
+                                    notchedOutline: classes.notchedOutline
+                                }
+                            }}
+                        >
+                            {deptList.map((e) => (
+                                <MenuItem key={e.id} value={e.id}>
+                                    {e.DeptName}
+                                </MenuItem>
+                            ))}
+                        </TextField>
 
-                        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-end' }}>
-                            <Grid item xs={6}>
-                                <TextField
-                                    fullWidth
-                                    name="birthdate"
-                                    InputLabelProps={{ shrink: true, required: true }}
-                                    onChange={HandleInput}
-                                    InputProps={{ style: { fontSize: 20, width: '98%' } }}
-                                    type={'date'}
-                                    fullWidth
-                                    label="Birth Date"
-                                    id="fullWidth"
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    fullWidth
-                                    name="joindate"
-                                    InputLabelProps={{ shrink: true, required: true }}
-                                    onChange={HandleInput}
-                                    InputProps={{ style: { fontSize: 20 } }}
-                                    type="date"
-                                    fullWidth
-                                    label="Join Date"
-                                    id="fullWidth"
-                                />
-                                <br />
-                                <br />
-                            </Grid>
-                        </Grid>
-                        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Grid item xs={4}>
-                                <TextField
-                                    fullWidth
-                                    name="yoe"
-                                    InputLabelProps={{ required: true }}
-                                    onChange={HandleInput}
-                                    InputProps={{ style: { fontSize: 20, width: '98%' } }}
-                                    fullWidth
-                                    label="Year of Experience"
-                                    id="fullWidth"
-                                />
-                                <br />
-                                <br />
-                            </Grid>
-                            <Grid item xs={4}>
-                                <TextField
-                                    fullWidth
-                                    name="initials"
-                                    onChange={HandleInput}
-                                    InputProps={{ style: { fontSize: 20, width: '98%' } }}
-                                    fullWidth
-                                    label="Initials"
-                                    id="fullWidth"
-                                />
-                            </Grid>
-                            <Grid item xs={4}>
-                                <TextField
-                                    fullWidth
-                                    name="userType"
-                                    InputLabelProps={{ required: true }}
-                                    onChange={HandleInput}
-                                    InputProps={{ style: { fontSize: 20 } }}
-                                    fullWidth
-                                    label="User Type"
-                                    id="fullWidth"
-                                />
-                            </Grid>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <FormControl component="fieldset">
-                                <FormLabel component="legend">Gender</FormLabel>
-                                <RadioGroup aria-label="gender" name="controlled-radio-buttons-group">
-                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <FormControlLabel
-                                            name="gender"
-                                            onChange={HandleInput}
-                                            value="F"
-                                            control={<Radio />}
-                                            label="Female"
-                                        />
-                                        <FormControlLabel name="gender" onChange={HandleInput} value="M" control={<Radio />} label="Male" />
-                                    </div>
-                                </RadioGroup>
-                            </FormControl>
-                            <Grid item xs={12}>
-                                <Divider />
-                            </Grid>
-                        </Grid>
-                        <Button onClick={Register_Clicked} fullWidth size="large" type="submit" variant="contained" color="secondary">
-                            Register
-                        </Button>
-                    </div>
-                    <div></div>
-                </>
-            )}
-            {!mode && (
-                <>
-                    {/* <form method='post' encType='multipart/form-data'> */}
-                    <input
-                        style={{
-                            width: '100%',
-                            textDecoration: 'none',
-                            backgroundColor: 'grey',
-                            color: '#fff',
-                            fontSize: '20px',
-                            borderRadius: '4px'
-                        }}
-                        type="file"
-                        name="file"
-                        id="file"
-                        onChange={fileUpload}
-                        class="inputfile"
-                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                    />
-                    <br />
-                    <br />
-                    <Button onClick={Register_Clicked_File} fullWidth size="large" type="submit" variant="contained" color="secondary">
-                        Register
-                    </Button>
-                    {/* </form> */}
-                </>
-            )}
+                        <FormControl error={Boolean(touched.joinDate && errors.joinDate)} className={classes.loginInput}>
+                            <InputLabel htmlFor="outlined-adornment-password-login">Join Date</InputLabel>
+                            <OutlinedInput
+                                id="outlined-adornment-password-login"
+                                type="date"
+                                value={values.joinDate}
+                                name="joinDate"
+                                onChange={handleChange}
+                                inputProps={{
+                                    classes: {
+                                        notchedOutline: classes.notchedOutline
+                                    }
+                                }}
+                            />
+                            {touched.joinDate && errors.joinDate && (
+                                <FormHelperText error id="standard-weight-helper-text-password-login">
+                                    {' '}
+                                    {errors.joinDate}{' '}
+                                </FormHelperText>
+                            )}
+                        </FormControl>
+
+                        {errors.submit && (
+                            <Box
+                                sx={{
+                                    mt: 3
+                                }}
+                            >
+                                <FormHelperText error>{errors.submit}</FormHelperText>
+                            </Box>
+                        )}
+
+                        <Box
+                            sx={{
+                                mt: 2
+                            }}
+                        >
+                            <Button
+                                disableElevation
+                                disabled={isSubmitting}
+                                size="large"
+                                type="submit"
+                                variant="contained"
+                                color="secondary"
+                            >
+                                Register
+                            </Button>
+                        </Box>
+                    </form>
+                )}
+            </Formik>
         </MainCard>
     );
-}
+};
 
-export default Register;
+export default AddFaculty;

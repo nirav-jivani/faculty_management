@@ -1,11 +1,10 @@
 // assets
-import { IconCalendarEvent, IconDashboard, IconDeviceAnalytics } from '@tabler/icons';
+import { IconUserPlus, IconUsers } from '@tabler/icons';
 
 // constant
 const icons = {
-    IconCalendarEvent: IconCalendarEvent,
-    IconDashboard: IconDashboard,
-    IconDeviceAnalytics
+    IconUserPlus: IconUserPlus,
+    IconUsers: IconUsers
 };
 
 //-----------------------|| DASHBOARD MENU ITEMS ||-----------------------//
@@ -21,14 +20,14 @@ export const Admin = {
             title: 'Add Faculty',
             type: 'item',
             url: '/admin/add-faculty',
-            icon: icons['IconCalendarEvent']
+            icon: icons['IconUserPlus']
         },
         {
             id: 'view-faculties',
             title: 'View Faculties',
             type: 'item',
             url: '/admin/view-faculties',
-            icon: icons['IconCalendarEvent']
+            icon: icons['IconUsers']
         }
     ]
 };

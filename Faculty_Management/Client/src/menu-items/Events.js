@@ -14,6 +14,7 @@ export const Events = {
     id: 'events',
     title: 'Events',
     type: 'group',
+    userType: 'Normal',
     children: [
         {
             id: 'event-conducted',

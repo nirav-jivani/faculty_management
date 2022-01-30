@@ -123,7 +123,7 @@ const MainLayout = ({ children }) => {
             >
                 {/* <Main open={leftDrawerOpened}> */}
                 {/* breadcrumb */}
-                <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
+                {/* <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign /> */}
                 <div>{children}</div>
                 {/* </Main> */}
             </main>

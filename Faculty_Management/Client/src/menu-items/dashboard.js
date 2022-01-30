@@ -12,6 +12,7 @@ const icons = {
 export const dashboard = {
     id: 'dashboard',
     title: 'Dashboard',
+    userType: 'Both',
     type: 'group',
     children: [
         {
