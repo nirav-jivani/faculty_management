@@ -9,9 +9,11 @@ router.post("/login", async (req, res) => {
   try {
     const data = { success: true, msg: "Invalid Email/Password" };
     const { email, password } = req.body;
-    const user = await db
-      .promise()
-      .query(`SELECT * FROM faculties WHERE Username=? `, [email]);
+    const user = await db.promise().query(
+      `SELECT *,f.id FROM faculties f inner join departments d on f.DeptId=d.id inner join designations ds on f.DesignationId = ds.id 
+        where Username = ? and Working = ? `,
+      [email, 1]
+    );
     if (
       user[0].length > 0 &&
       (await bcrypt.compare(password, user[0][0].Password))
@@ -28,9 +30,35 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.get("/check", authenticateUser, (req, res) => {
-  console.log("checking..");
-  res.json({ tenp: "checked" });
+router.post("/update-account", authenticateUser, async (req, res) => {
+  const data = req.body;
+  try {
+    const temp = await db
+      .promise()
+      .query(
+        `UPDATE faculties SET Username=?, FirstName=?, MiddleName=?, LastName=?, BirthDate=?, Qualification=?, Gender=?, YearOfExperience=? WHERE id = ?`,
+        [
+          data.email,
+          data.firstName,
+          data.middleName,
+          data.lastName,
+          data.birthDate,
+          data.qualification,
+          data.gender,
+          data.yoe,
+          req.user.id,
+        ]
+      );
+    const user = await db.promise().query(
+      `SELECT *,f.id FROM faculties f inner join departments d on f.DeptId=d.id inner join designations ds on f.DesignationId = ds.id 
+        where f.id=? `,
+      [req.user.id]
+    );
+    res.json({ success: true, user: user[0][0] });
+  } catch (err) {
+    const data = { success: false, msg: "internal server Error" };
+    res.status(500).json(data);
+  }
 });
 
 module.exports = router;

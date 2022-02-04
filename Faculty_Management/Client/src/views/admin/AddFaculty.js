@@ -2,6 +2,7 @@ import { React, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { format } from 'date-fns';
+import { useHistory } from 'react-router';
 // material-ui
 import { makeStyles } from '@material-ui/styles';
 
@@ -75,18 +76,22 @@ const useStyles = makeStyles((theme) => ({
 
 const AddFaculty = (props, { ...others }) => {
     const classes = useStyles();
-
+    const history = useHistory();
     const scriptedRef = useScriptRef();
 
     const account = useSelector((state) => state.account);
     const [deptList, setDeptList] = useState([]);
+    const [designationList, setDesignationList] = useState([]);
     useEffect(() => {
-        axios.get(configData.API_SERVER + 'admin/get-departments', { headers: { 'x-auth-token': account.token } }).then((response) => {
-            if (response.data.success) {
-                setDeptList(response.data.deptList);
-                console.log(deptList);
-            }
-        });
+        axios
+            .get(configData.API_SERVER + 'admin/get-dept-designations', { headers: { 'x-auth-token': account.token } })
+            .then((response) => {
+                if (response.data.success) {
+                    setDeptList(response.data.deptList);
+                    setDesignationList(response.data.designationList);
+                    //console.log(deptList);
+                }
+            });
     }, []);
 
     return (
@@ -95,7 +100,8 @@ const AddFaculty = (props, { ...others }) => {
                 initialValues={{
                     email: '',
                     joinDate: format(new Date(), 'yyyy-MM-dd'),
-                    dept: ''
+                    department: '',
+                    designation: ''
                 }}
                 validationSchema={Yup.object().shape({
                     email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
@@ -109,17 +115,20 @@ const AddFaculty = (props, { ...others }) => {
                                 {
                                     joinDate: values.joinDate,
                                     email: values.email,
-                                    dept: values.dept
+                                    department: values.department,
+                                    designation: values.designation
                                 },
                                 { headers: { 'x-auth-token': account.token } }
                             )
                             .then(function (response) {
                                 if (response.data.success) {
                                     console.log('success');
+                                    window.alert('Added Sucessfully');
                                     if (scriptedRef.current) {
                                         setStatus({ success: true });
                                         setSubmitting(false);
                                     }
+                                    history.push('/admin/view-faculties');
                                 } else {
                                     setStatus({ success: false });
                                     setErrors({ submit: response.data.msg });
@@ -171,10 +180,10 @@ const AddFaculty = (props, { ...others }) => {
                         <TextField
                             select
                             InputLabelProps={{ shrink: true }}
-                            id="dept"
+                            id="department"
                             value={values.dept}
-                            name="dept"
-                            label="Branch"
+                            name="department"
+                            label="department"
                             fullWidth
                             margin="normal"
                             onBlur={handleBlur}
@@ -188,6 +197,30 @@ const AddFaculty = (props, { ...others }) => {
                             {deptList.map((e) => (
                                 <MenuItem key={e.id} value={e.id}>
                                     {e.DeptName}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+
+                        <TextField
+                            select
+                            InputLabelProps={{ shrink: true }}
+                            id="designation"
+                            value={values.dept}
+                            name="designation"
+                            label="designation"
+                            fullWidth
+                            margin="normal"
+                            onBlur={handleBlur}
+                            onChange={handleChange}
+                            inputProps={{
+                                classes: {
+                                    notchedOutline: classes.notchedOutline
+                                }
+                            }}
+                        >
+                            {designationList.map((e) => (
+                                <MenuItem key={e.id} value={e.id}>
+                                    {e.Designation}
                                 </MenuItem>
                             ))}
                         </TextField>

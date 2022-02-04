@@ -24,8 +24,9 @@ const EventConducted = Loadable(lazy(() => import('../views/events/event-conduct
 const AddFaculty = Loadable(lazy(() => import('../views/admin/AddFaculty')));
 
 const ViewFaculties = Loadable(lazy(() => import('../views/admin/ViewFaculties')));
+// const PastFaculties = Loadable(lazy(() => import('../views/admin/PastFaculties')));
 const Home = Loadable(lazy(() => import('../views/Home')));
-
+const MyAccount = Loadable(lazy(() => import('../views/accounts/MyAccount')));
 //-----------------------|| MAIN ROUTING ||-----------------------//
 
 const MainRoutes = () => {
@@ -44,16 +45,15 @@ const MainRoutes = () => {
                 '/icons/material-icons',
                 '/icons/cards',
                 '/admin/add-faculty',
-
                 '/admin/view-faculties',
-                '/events/event-conducted'
+                '/events/event-conducted',
+                '/accounts/my-account'
             ]}
         >
             <MainLayout>
                 <Switch location={location} key={location.pathname}>
                     <AuthGuard>
                         <Route path="/dashboard/default" component={DashboardDefault} />
-
                         <Route path="/utils/util-typography" component={UtilsTypography} />
                         <Route path="/utils/util-color" component={UtilsColor} />
                         <Route path="/utils/util-shadow" component={UtilsShadow} />
@@ -61,12 +61,11 @@ const MainRoutes = () => {
                         <Route path="/icons/material-icons" component={UtilsMaterialIcons} />
                         <Route path="/icons/form_elements" component={form_elements} />
                         <Route path="/icons/cards" component={cards} />
-
                         <Route path="/admin/add-faculty" component={AddFaculty} />
                         <Route path="/admin/view-faculties" component={ViewFaculties} />
-
                         <Route path="/events/event-conducted" component={EventConducted} />
                         <Route path="/home/index" component={Home} />
+                        <Route path="/accounts/my-account" component={MyAccount} />
                     </AuthGuard>
                 </Switch>
             </MainLayout>
