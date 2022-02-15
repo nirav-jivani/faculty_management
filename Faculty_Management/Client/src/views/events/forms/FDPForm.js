@@ -1,213 +1,420 @@
-import React from 'react';
+import { React, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { format } from 'date-fns';
-import axios from 'axios';
-import configData from '../../../config';
-
 // material-ui
 import { makeStyles } from '@material-ui/styles';
+
 import {
-    Card,
     Box,
     TextField,
     MenuItem,
-    FormControl,
-    Radio,
-    RadioGroup,
-    FormLabel,
-    FormControlLabel,
-    Switch,
-    FormGroup,
-    Stack,
     Button,
-    Checkbox
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    FormHelperText,
+    IconButton,
+    InputAdornment,
+    InputLabel,
+    OutlinedInput,
+    Stack,
+    Typography,
+    Radio,
+    FormLabel,
+    RadioGroup
 } from '@material-ui/core';
 
-import { handle } from 'express/lib/application';
+// third party
+import * as Yup from 'yup';
+import { Formik } from 'formik';
+import axios from 'axios';
 
-// import { Fab, AddIcon, EditIcon, FavoriteIcon, NavigationIcon } from '@material-ui/material';
+// project imports
+import MainCard from './../../../ui-component/cards/MainCard';
+import configData from '../../../config';
+import useScriptRef from '../../../hooks/useScriptRef';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
-    frame: {
-        height: 'calc(100vh - 210px)',
+    redButton: {
+        fontSize: '1rem',
+        fontWeight: 500,
+        backgroundColor: theme.palette.grey[50],
         border: '1px solid',
-        borderColor: theme.palette.primary.light
+        borderColor: theme.palette.grey[100],
+        color: theme.palette.grey[700],
+        textTransform: 'none',
+        '&:hover': {
+            backgroundColor: theme.palette.primary.light
+        },
+        [theme.breakpoints.down('sm')]: {
+            fontSize: '0.875rem'
+        }
+    },
+    signDivider: {
+        flexGrow: 1
+    },
+    signText: {
+        cursor: 'unset',
+        margin: theme.spacing(2),
+        padding: '5px 56px',
+        borderColor: theme.palette.grey[100] + ' !important',
+        color: theme.palette.grey[900] + '!important',
+        fontWeight: 500
+    },
+    loginIcon: {
+        marginRight: '16px',
+        [theme.breakpoints.down('sm')]: {
+            marginRight: '8px'
+        }
+    },
+    loginInput: {
+        ...theme.typography.customInput
     }
 }));
 
-//=============================: Sample Form :=============================//
+//============================|| API JWT - LOGIN ||============================//
 
-const WorkshopForm = (props) => {
-    // const classes = useStyles();
-    const passData = props.passData;
+const EventAttended = (props, { ...others }) => {
+    const classes = useStyles();
+    const scriptedRef = useScriptRef();
     const account = useSelector((state) => state.account);
-    const [data, setData] = React.useState({
-        id: passData ? passData.id : '',
-        title: passData ? passData.title : '',
-        factName: passData ? passData.speaker_name : '',
-        organizedBy: passData ? passData.organization_name : '',
-        organizedAt: passData ? passData.venue : '',
-        approvedBy: passData ? passData.approved_by : '',
-        mode: passData ? passData.mode : 'Online',
-        type: passData ? passData.event_type : 'FDP',
-        other: passData ? passData.other_type : '',
-        participants: passData ? passData.participants : '',
-        fromDate: passData ? format(new Date(passData.from_date), 'yyyy-MM-dd') : '',
-        toDate: passData ? format(new Date(passData.to_date), 'yyyy-MM-dd') : '',
-        duration: passData ? passData.duration : '',
-        academicYear: passData ? passData.academic_year : '',
-        file: null
-    });
-
-    const handleOnChange = (event) => {
-        // if (event.target.name === 'file') {
-        //     setData({ ...data, [event.target.name]: event.target.files[0] });
-        // } else {
-        setData({ ...data, [event.target.name]: event.target.value });
-        // }
-    };
-
-    const handleOnClick = (event) => {
-        event.preventDefault();
-
-        // const formData = new FormData();
-        // formData.append('File', data.file);
-        axios
-            .post(configData.API_SERVER + 'events/add-event', data, {
-                headers: { 'x-auth-token': account.token }
-            })
-            .then((response) => {
-                console.log(response);
-                props.changeFunc();
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
+    const [deptList, setDeptList] = useState([]);
+    const [designationList, setDesignationList] = useState([]);
+    const passData = props.passData;
 
     return (
         <>
-            <TextField fullWidth label="Title of the programme" name="title" value={data.title} onChange={handleOnChange} />
-            <br />
-            <br />
-            <br />
-            <TextField fullWidth label="Name of the faculty" name="factName" value={data.factName} onChange={handleOnChange} />
-            <br />
-            <br />
-            <br />
-            <TextField fullWidth label="Organized by" name="organizedBy" value={data.organizedBy} onChange={handleOnChange} />
-            <br />
-            <br />
-            <br />
-            <TextField
-                fullWidth
-                label="Organized at"
-                multiline
-                rows={4}
-                variant="outlined"
-                name="organizedAt"
-                value={data.organizedAt}
-                onChange={handleOnChange}
-            />
-            <br />
-            <br />
-            <br />
-            <TextField
-                fullWidth
-                label="Programme approved/sponsored by"
-                name="approvedBy"
-                value={data.approvedBy}
-                onChange={handleOnChange}
-            />
-            <br />
-            <br />
-            <br />
-            <FormControl component="fieldset">
-                <FormLabel component="legend">Mode of conduct</FormLabel>
-                <RadioGroup aria-label="mode" name="mode" value={data.mode} onChange={handleOnChange}>
-                    <FormControlLabel value="Online" control={<Radio />} label="Online" />
-                    <FormControlLabel value="Offline" control={<Radio />} label="Offline" />
-                </RadioGroup>
-            </FormControl>
-            <br />
-            <br />
-            <FormControl component="fieldset">
-                <FormLabel component="legend">Type of programme</FormLabel>
-                <RadioGroup aria-label="type" name="type" value={data.type} onChange={handleOnChange}>
-                    <FormControlLabel value="FDP" control={<Radio />} label="FDP" />
-                    <FormControlLabel value="Workshop" control={<Radio />} label="Workshop" />
-                    <FormControlLabel value="Seminar" control={<Radio />} label="Seminar" />
-                    <FormControlLabel value="STTP" control={<Radio />} label="STTP" />
-                    <FormControlLabel value="Webinar" control={<Radio />} label="Webinar" />
-                    <FormControlLabel value="Any Other" control={<Radio />} label="Any Other" />
-                </RadioGroup>
-            </FormControl>
-            <br />
-            <br />
-            <br />
-            <TextField
-                fullWidth
-                label="Type of programme if other than FDP/STTP/Workshop/Seminar"
-                name="other"
-                value={data.other}
-                onChange={handleOnChange}
-            />
-            <br />
-            <br />
-            <br />
-            <TextField
-                label="From date"
-                InputLabelProps={{ shrink: true }}
-                type="date"
-                name="fromDate"
-                value={data.fromDate}
-                onChange={handleOnChange}
-            />
-            <br />
-            <br />
-            <br />
-            <TextField
-                label="To date"
-                InputLabelProps={{ shrink: true }}
-                type="date"
-                name="toDate"
-                value={data.toDate}
-                onChange={handleOnChange}
-            />
-            <br />
-            <br />
-            <br />
-            <TextField fullWidth label="Duration (in days)" name="duration" value={data.duration} onChange={handleOnChange} />
-            <br />
-            <br />
-            <br />
+            <Formik
+                initialValues={{
+                    id: passData ? passData.id : '',
+                    title: passData ? passData.EventTitle : '',
+                    organizedBy: passData ? passData.OrganizedBy : '',
+                    organizedAt: passData ? passData.OrganizedAt : '',
+                    fromDate: passData ? format(new Date(passData.StartDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
+                    toDate: passData ? format(new Date(passData.EndDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
+                    duration: passData ? passData.Duration : '',
+                    speakerName: passData ? passData.SpeakerName : '',
+                    topic: passData ? passData.EventTopic : '',
+                    level: passData ? passData.EventLevel : 'Local',
+                    type: passData ? passData.EventType : 'FDP',
+                    otherType: passData ? passData.OtherType : '',
+                    mode: passData ? passData.EventMode : 'Online',
+                    academicYear: passData ? passData.AcedemicYear : '',
+                    approvedBy: passData ? passData.ApprovedBy : '',
+                    file: null
+                }}
+                validationSchema={Yup.object().shape({
+                    title: Yup.string().required('Event Title is required'),
+                    organizedBy: Yup.string().required('Organized By is required'),
+                    organizedAt: Yup.string().required('Organized At is required'),
+                    fromDate: Yup.string().required('From Date is required'),
+                    toDate: Yup.string().required('To date is required'),
+                    duration: Yup.string().required('Duration is required'),
+                    speakerName: Yup.string().required('Speaker Name is required'),
+                    topic: Yup.string().required('Topic Name is required'),
+                    academicYear: Yup.string().required('Academic Year is required'),
+                    approvedBy: Yup.string().required('Approved By is required')
+                })}
+                onSubmit={(values, { setErrors, setStatus, setSubmitting }) => {
+                    try {
+                        axios
+                            .post(
+                                configData.API_SERVER + 'events/event-attended',
+                                {
+                                    id: values.id,
+                                    title: values.title,
+                                    organizedBy: values.organizedBy,
+                                    organizedAt: values.organizedAt,
+                                    fromDate: values.fromDate,
+                                    toDate: values.toDate,
+                                    duration: values.duration,
+                                    speakerName: values.speakerName,
+                                    topic: values.topic,
+                                    level: values.level,
+                                    type: values.type,
+                                    otherType: values.otherType,
+                                    mode: values.mode,
+                                    academicYear: values.academicYear,
+                                    approvedBy: values.approvedBy,
+                                    file: null
+                                },
+                                { headers: { 'x-auth-token': account.token } }
+                            )
+                            .then(function (response) {
+                                if (response.data.success) {
+                                    console.log('success');
+                                    window.alert((passData ? 'Updated' : 'Added') + ' Sucessfully');
+                                    if (scriptedRef.current) {
+                                        setStatus({ success: true });
+                                        setSubmitting(false);
+                                    }
+                                    props.changeFunc();
+                                } else {
+                                    setStatus({ success: false });
+                                    setErrors({ submit: response.data.msg });
+                                    setSubmitting(false);
+                                }
+                            })
+                            .catch(function (error) {
+                                setStatus({ success: false });
+                                setErrors({ submit: error.response.data.msg });
+                                setSubmitting(false);
+                            });
+                    } catch (err) {
+                        console.error(err);
+                        if (scriptedRef.current) {
+                            setStatus({ success: false });
+                            setErrors({ submit: err.message });
+                            setSubmitting(false);
+                        }
+                    }
+                }}
+            >
+                {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
+                    <form noValidate onSubmit={handleSubmit} {...others}>
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Title of the programme"
+                            error={Boolean(touched.title && errors.title)}
+                            name="title"
+                            value={values.title}
+                            onChange={handleChange}
+                        />
+                        {touched.title && errors.title && (
+                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                                {' '}
+                                {errors.title}{' '}
+                            </FormHelperText>
+                        )}
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Organized By"
+                            error={Boolean(touched.organizedBy && errors.organizedBy)}
+                            name="organizedBy"
+                            value={values.organizedBy}
+                            onChange={handleChange}
+                        />
+                        {touched.organizedBy && errors.organizedBy && (
+                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                                {' '}
+                                {errors.organizedBy}{' '}
+                            </FormHelperText>
+                        )}
 
-            <TextField fullWidth label="Total Participants" name="participants" value={data.participants} onChange={handleOnChange} />
-            <br />
-            <br />
-            <br />
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Organized At"
+                            error={Boolean(touched.organizedAt && errors.organizedAt)}
+                            name="organizedAt"
+                            value={values.organizedAt}
+                            onChange={handleChange}
+                        />
+                        {touched.organizedAt && errors.organizedAt && (
+                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                                {' '}
+                                {errors.organizedAt}{' '}
+                            </FormHelperText>
+                        )}
 
-            <TextField fullWidth label="Academic year" name="academicYear" value={data.academicYear} onChange={handleOnChange} />
-            <br />
-            <br />
-            <br />
-            <TextField
-                fullWidth
-                label="Scanned Copy of Certificate"
-                name="file"
-                InputLabelProps={{ shrink: true }}
-                onChange={handleOnChange}
-                type="file"
-            />
-            <br />
-            <br />
-            <br />
-            <Button variant="contained" fullWidth size="large" onClick={handleOnClick}>
-                {passData ? 'Update' : 'Submit'}
-            </Button>
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            type="date"
+                            label="From Date"
+                            error={Boolean(touched.fromDate && errors.fromDate)}
+                            name="fromDate"
+                            value={values.fromDate}
+                            onChange={handleChange}
+                        />
+                        {touched.fromDate && errors.fromDate && (
+                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                                {' '}
+                                {errors.fromDate}{' '}
+                            </FormHelperText>
+                        )}
+
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            type="date"
+                            label="To Date"
+                            error={Boolean(touched.toDate && errors.toDate)}
+                            name="toDate"
+                            value={values.toDate}
+                            onChange={handleChange}
+                        />
+                        {touched.toDate && errors.toDate && (
+                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                                {' '}
+                                {errors.toDate}{' '}
+                            </FormHelperText>
+                        )}
+
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Duration"
+                            error={Boolean(touched.duration && errors.duration)}
+                            name="duration"
+                            value={values.duration}
+                            onChange={handleChange}
+                        />
+                        {touched.duration && errors.duration && (
+                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                                {' '}
+                                {errors.duration}{' '}
+                            </FormHelperText>
+                        )}
+
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Speaker Of The Event"
+                            error={Boolean(touched.speakerName && errors.speakerName)}
+                            name="speakerName"
+                            value={values.speakerName}
+                            onChange={handleChange}
+                        />
+                        {touched.speakerName && errors.speakerName && (
+                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                                {' '}
+                                {errors.speakerName}{' '}
+                            </FormHelperText>
+                        )}
+
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Topic of The Event"
+                            error={Boolean(touched.topic && errors.topic)}
+                            name="topic"
+                            value={values.topic}
+                            onChange={handleChange}
+                        />
+                        {touched.topic && errors.topic && (
+                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                                {' '}
+                                {errors.topic}{' '}
+                            </FormHelperText>
+                        )}
+
+                        <FormControl fullWidth margin="normal" component="fieldset">
+                            <FormLabel component="legend">Level of Event</FormLabel>
+                            <RadioGroup aria-label="type" name="level" value={values.level} onChange={handleChange}>
+                                <FormControlLabel value="Local" control={<Radio />} label="Local" />
+                                <FormControlLabel value="National" control={<Radio />} label="National" />
+                                <FormControlLabel value="International" control={<Radio />} label="International" />
+                            </RadioGroup>
+                        </FormControl>
+
+                        <FormControl fullWidth margin="normal" component="fieldset">
+                            <FormLabel component="legend">Type of Event</FormLabel>
+                            <RadioGroup aria-label="type" name="type" value={values.type} onChange={handleChange}>
+                                <FormControlLabel value="FDP" control={<Radio />} label="FDP" />
+                                <FormControlLabel value="Workshop" control={<Radio />} label="Workshop" />
+                                <FormControlLabel value="Seminar" control={<Radio />} label="Seminar" />
+                                <FormControlLabel value="STTP" control={<Radio />} label="STTP" />
+                                <FormControlLabel value="Webinar" control={<Radio />} label="Webinar" />
+                                <FormControlLabel value="Any Other" control={<Radio />} label="Any Other" />
+                            </RadioGroup>
+                        </FormControl>
+
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            helperText="Write , If you have selected Any Other option.."
+                            label="Other Type"
+                            name="otherType"
+                            value={values.otherType}
+                            onChange={handleChange}
+                        />
+
+                        <FormControl fullWidth margin="normal" component="fieldset">
+                            <FormLabel component="legend">Mode of Event</FormLabel>
+                            <RadioGroup aria-label="type" name="mode" value={values.mode} onChange={handleChange}>
+                                <FormControlLabel value="Online" control={<Radio />} label="Online" />
+                                <FormControlLabel value="Offline" control={<Radio />} label="Offline" />
+                            </RadioGroup>
+                        </FormControl>
+
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Academic Year"
+                            error={Boolean(touched.academicYear && errors.academicYear)}
+                            name="academicYear"
+                            value={values.academicYear}
+                            onChange={handleChange}
+                        />
+                        {touched.academicYear && errors.academicYear && (
+                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                                {' '}
+                                {errors.academicYear}{' '}
+                            </FormHelperText>
+                        )}
+
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Approved By"
+                            error={Boolean(touched.approvedBy && errors.approvedBy)}
+                            name="approvedBy"
+                            value={values.approvedBy}
+                            onChange={handleChange}
+                        />
+                        {touched.approvedBy && errors.approvedBy && (
+                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                                {' '}
+                                {errors.approvedBy}{' '}
+                            </FormHelperText>
+                        )}
+
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Scanned Copy of Certificate"
+                            name="file"
+                            InputLabelProps={{ shrink: true }}
+                            onChange={handleChange}
+                            type="file"
+                        />
+
+                        {errors.submit && (
+                            <Box
+                                sx={{
+                                    mt: 3
+                                }}
+                            >
+                                <FormHelperText error>{errors.submit}</FormHelperText>
+                            </Box>
+                        )}
+
+                        <Box
+                            sx={{
+                                mt: 2
+                            }}
+                        >
+                            <Button
+                                disableElevation
+                                disabled={isSubmitting}
+                                size="large"
+                                type="submit"
+                                variant="contained"
+                                color="secondary"
+                            >
+                                {passData ? 'UPDATE ' : 'ADD '} EVENT
+                            </Button>
+                        </Box>
+                    </form>
+                )}
+            </Formik>
         </>
     );
 };
 
-export default WorkshopForm;
+export default EventAttended;

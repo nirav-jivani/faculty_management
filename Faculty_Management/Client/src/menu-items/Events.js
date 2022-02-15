@@ -11,51 +11,30 @@ const icons = {
 //-----------------------|| DASHBOARD MENU ITEMS ||-----------------------//
 
 export const Events = {
-    id: 'events',
-    title: 'Events',
+    id: 'profile',
+    title: 'Profile',
     type: 'group',
     userType: 'Normal',
     children: [
         {
-            id: 'event-conducted',
-            title: 'Event Conducted',
-            type: 'collapse',
-            icon: icons['IconCalendarEvent'],
-            children: [
-                {
-                    id: 'Event',
-                    title: 'View Events',
-                    type: 'item',
-                    url: '/events/event-conducted',
-                    breadcrumbs: false
-                }
-                // {
-                //     id: 'Expert_Lectures',
-                //     title: 'Expert_Lectures',
-                //     type: 'item',
-                //     url: '/events/event-conducted',
-                //     breadcrumbs: false
-                // },
-                // {
-                //     id: 'Seminars',
-                //     title: 'Seminars',
-                //     type: 'item',
-                //     url: '/events/event-conducted',
-                //     breadcrumbs: false
-                // }
-            ]
-        },
-        {
-            id: 'event-organized',
-            title: 'Event Organized',
-            type: 'collapse',
+            id: 'event-attended',
+            title: 'Event Attended',
+            type: 'item',
+            url: '/events/event-attended',
             icon: icons['IconCalendarEvent'],
             children: []
         },
         {
-            id: 'event-attended',
-            title: 'Event Attended',
-            type: 'collapse',
+            id: 'event-conducted',
+            title: 'Event Conducted',
+            type: 'item',
+            icon: icons['IconCalendarEvent'],
+            children: []
+        },
+        {
+            id: 'event-organized',
+            title: 'Event Organized',
+            type: 'item',
             icon: icons['IconCalendarEvent'],
             children: []
         }

@@ -15,12 +15,12 @@ import { useSelector } from 'react-redux';
 
 //==============================|| TYPOGRAPHY ||==============================//
 
-const EventConducted = () => {
+const EventAttended = () => {
     const account = useSelector((state) => state.account);
-    const [passData, setPassData] = useState();
+    const [passData, setPassData] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [btnText, setBtnText] = useState('Add Event');
-    const [data, setData] = useState([{}]);
+    const [data, setData] = useState([]);
 
     const getEvents = () => {
         axios
@@ -43,7 +43,7 @@ const EventConducted = () => {
     };
     return (
         <MainCard
-            title="Event Conducted"
+            title="Event Attended"
             secondary={
                 <Button onClick={handleOnClick} variant="contained" fullWidth size="small">
                     {btnText}
@@ -56,7 +56,7 @@ const EventConducted = () => {
                     {data.map((ele) => (
                         <Grid item xs={12} sm={6} key={ele.id}>
                             <SubCard
-                                title={`${ele.title} ( ${ele.event_type} )`}
+                                title={`${ele.EventTitle} ( ${ele.EventType} )`}
                                 onClick={() => {
                                     setPassData(ele);
                                     showForm === true ? setBtnText('Add Event') : setBtnText('Show Events');
@@ -66,19 +66,19 @@ const EventConducted = () => {
                                 <Grid container direction="column" spacing={1}>
                                     <Grid item>
                                         <MuiTypography variant="subtitle1" gutterBottom>
-                                            {`Conducted By : ${ele.organizer_name} ( ${ele.organization_name} )`}
+                                            {`Conducted By : ${ele.SpeakerName}`}
                                         </MuiTypography>
                                     </Grid>
 
                                     <Grid item>
                                         <MuiTypography variant="subtitle2" gutterBottom>
-                                            {` At : ${ele.venue} `}
+                                            {` At : ${ele.OrganizedAt} `}
                                         </MuiTypography>
                                     </Grid>
 
                                     <Grid item>
                                         <MuiTypography variant="subtitle2" gutterBottom>
-                                            {` Date : ${ele.from_date} - ${ele.to_date}  `}
+                                            {` Date : ${ele.StartDate} - ${ele.EndDate}  `}
                                         </MuiTypography>
                                     </Grid>
                                 </Grid>
@@ -91,4 +91,4 @@ const EventConducted = () => {
     );
 };
 
-export default EventConducted;
+export default EventAttended;

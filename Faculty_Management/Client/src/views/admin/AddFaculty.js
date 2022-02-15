@@ -101,11 +101,15 @@ const AddFaculty = (props, { ...others }) => {
                     email: '',
                     joinDate: format(new Date(), 'yyyy-MM-dd'),
                     department: '',
-                    designation: ''
+                    designation: '',
+                    firstName: '',
+                    lastName: ''
                 }}
                 validationSchema={Yup.object().shape({
                     email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                    joinDate: Yup.string().max(255).required('Join Date is required')
+                    joinDate: Yup.string().max(255).required('Join Date is required'),
+                    department: Yup.string().required('Department is required'),
+                    designation: Yup.string().required('Designation is required')
                 })}
                 onSubmit={(values, { setErrors, setStatus, setSubmitting }) => {
                     try {
@@ -116,7 +120,9 @@ const AddFaculty = (props, { ...others }) => {
                                     joinDate: values.joinDate,
                                     email: values.email,
                                     department: values.department,
-                                    designation: values.designation
+                                    designation: values.designation,
+                                    firstName: values.firstName,
+                                    lastName: values.lastName
                                 },
                                 { headers: { 'x-auth-token': account.token } }
                             )
@@ -152,6 +158,43 @@ const AddFaculty = (props, { ...others }) => {
             >
                 {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                     <form noValidate onSubmit={handleSubmit} {...others}>
+                        <Stack direction="row" justifyContent="center" spacing={2} alignItems="center">
+                            <FormControl fullWidth className={classes.loginInput}>
+                                <InputLabel htmlFor="firstname">First Name</InputLabel>
+                                <OutlinedInput
+                                    id="firstname"
+                                    value={values.firstName}
+                                    name="firstName"
+                                    onBlur={handleBlur}
+                                    onChange={handleChange}
+                                    // disabled={isDisabled}
+                                    inputProps={{
+                                        classes: {
+                                            className: classes.placeHolder,
+                                            notchedOutline: classes.notchedOutline
+                                        }
+                                    }}
+                                />
+                            </FormControl>
+
+                            <FormControl fullWidth className={classes.loginInput}>
+                                <InputLabel htmlFor="lastname">Last Name</InputLabel>
+                                <OutlinedInput
+                                    id="lastname"
+                                    value={values.lastName}
+                                    name="lastName"
+                                    onBlur={handleBlur}
+                                    onChange={handleChange}
+                                    // disabled={isDisabled}
+                                    inputProps={{
+                                        classes: {
+                                            className: classes.placeHolder,
+                                            notchedOutline: classes.notchedOutline
+                                        }
+                                    }}
+                                />
+                            </FormControl>
+                        </Stack>
                         <FormControl fullWidth error={Boolean(touched.email && errors.email)} className={classes.loginInput}>
                             <InputLabel htmlFor="outlined-adornment-email-login">Email</InputLabel>
                             <OutlinedInput
@@ -180,10 +223,11 @@ const AddFaculty = (props, { ...others }) => {
                         <TextField
                             select
                             InputLabelProps={{ shrink: true }}
+                            error={Boolean(touched.department && errors.department)}
                             id="department"
                             value={values.dept}
                             name="department"
-                            label="department"
+                            label="Department"
                             fullWidth
                             margin="normal"
                             onBlur={handleBlur}
@@ -200,14 +244,21 @@ const AddFaculty = (props, { ...others }) => {
                                 </MenuItem>
                             ))}
                         </TextField>
+                        {touched.department && errors.department && (
+                            <FormHelperText error id="standard-weight-helper-text-email-login">
+                                {' '}
+                                {errors.department}{' '}
+                            </FormHelperText>
+                        )}
 
                         <TextField
                             select
                             InputLabelProps={{ shrink: true }}
+                            error={Boolean(touched.designation && errors.designation)}
                             id="designation"
                             value={values.dept}
                             name="designation"
-                            label="designation"
+                            label="Designation"
                             fullWidth
                             margin="normal"
                             onBlur={handleBlur}
@@ -224,6 +275,12 @@ const AddFaculty = (props, { ...others }) => {
                                 </MenuItem>
                             ))}
                         </TextField>
+                        {touched.designation && errors.designation && (
+                            <FormHelperText error id="standard-weight-helper-text-email-login">
+                                {' '}
+                                {errors.designation}{' '}
+                            </FormHelperText>
+                        )}
 
                         <FormControl error={Boolean(touched.joinDate && errors.joinDate)} className={classes.loginInput}>
                             <InputLabel htmlFor="outlined-adornment-password-login">Join Date</InputLabel>

@@ -19,7 +19,7 @@ const UtilsTablerIcons = Loadable(lazy(() => import('../views/utilities/TablerIc
 const cards = Loadable(lazy(() => import('../views/utilities/cards')));
 
 // sample page routing
-const EventConducted = Loadable(lazy(() => import('../views/events/event-conducted/EventConducted')));
+const EventAttended = Loadable(lazy(() => import('../views/events/event-attended/EventAttended')));
 
 const AddFaculty = Loadable(lazy(() => import('../views/admin/AddFaculty')));
 
@@ -46,7 +46,7 @@ const MainRoutes = () => {
                 '/icons/cards',
                 '/admin/add-faculty',
                 '/admin/view-faculties',
-                '/events/event-conducted',
+                '/events/event-attended',
                 '/accounts/my-account'
             ]}
         >
@@ -63,7 +63,7 @@ const MainRoutes = () => {
                         <Route path="/icons/cards" component={cards} />
                         <Route path="/admin/add-faculty" component={AddFaculty} />
                         <Route path="/admin/view-faculties" component={ViewFaculties} />
-                        <Route path="/events/event-conducted" component={EventConducted} />
+                        <Route path="/events/event-attended" component={EventAttended} />
                         <Route path="/home/index" component={Home} />
                         <Route path="/accounts/my-account" component={MyAccount} />
                     </AuthGuard>

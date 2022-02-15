@@ -89,7 +89,7 @@ const MyAccount = (props, { ...others }) => {
 
     const stringAvatar = (name) => {
         return {
-            children: `${name.split('@')[0][0]}`
+            children: `${name.split(' ')[0][0] + name.split(' ')[1][0]}`
         };
     };
 
@@ -98,8 +98,8 @@ const MyAccount = (props, { ...others }) => {
             title="My Account"
             secondary={
                 <Stack direction="row" alignItems="center" spacing={2}>
-                    <Typography variant="h2">{account.user.Username}</Typography>
-                    <Avatar {...stringAvatar(account.user.Username)} />
+                    <Typography variant="h2">{account.user.FirstName + ' ' + account.user.LastName}</Typography>
+                    <Avatar {...stringAvatar(account.user.FirstName + ' ' + account.user.LastName)} />
                 </Stack>
             }
         >
