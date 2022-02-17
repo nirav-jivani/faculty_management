@@ -129,7 +129,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                         formData.append(
                             'data',
                             JSON.stringify({
-                                id: values.id,
+                                id: passData ? passData.id : '',
                                 title: values.title,
                                 organizedBy: values.organizedBy,
                                 organizedAt: values.organizedAt,

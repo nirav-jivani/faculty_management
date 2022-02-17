@@ -1,11 +1,11 @@
 // assets
-import { IconCalendarEvent, IconDashboard, IconDeviceAnalytics } from '@tabler/icons';
+import { IconCalendarEvent, IconPlus, IconList } from '@tabler/icons';
 
 // constant
 const icons = {
     IconCalendarEvent: IconCalendarEvent,
-    IconDashboard: IconDashboard,
-    IconDeviceAnalytics
+    IconPlus: IconPlus,
+    IconList : IconList
 };
 
 //-----------------------|| DASHBOARD MENU ITEMS ||-----------------------//
@@ -27,14 +27,14 @@ export const Events = {
                     title: 'Add Event',
                     type: 'item',
                     url: '/event-attended/add-event',
-                    icon: icons['IconCalendarEvent']
+                    icon: icons['IconPlus']
                 },
                 {
                     id: 'view-events',
                     title: 'View Events',
                     type: 'item',
                     url: '/event-attended/view-events',
-                    icon: icons['IconCalendarEvent']
+                    icon: icons['IconList']
                 }
             ]
         },
@@ -49,14 +49,14 @@ export const Events = {
                     title: 'Add Event',
                     type: 'item',
                     url: '/events/event-attended',
-                    icon: icons['IconCalendarEvent']
+                    icon: icons['IconPlus']
                 },
                 {
                     id: 'view-event',
                     title: 'View Event',
                     type: 'item',
                     url: '/events/event-attended',
-                    icon: icons['IconCalendarEvent']
+                    icon: icons['IconList']
                 }
             ]
         },
@@ -71,14 +71,14 @@ export const Events = {
                     title: 'Add Event',
                     type: 'item',
                     url: '/events/event-attended',
-                    icon: icons['IconCalendarEvent']
+                    icon: icons['IconPlus']
                 },
                 {
                     id: 'view-event',
                     title: 'View Event',
                     type: 'item',
                     url: '/events/event-attended',
-                    icon: icons['IconCalendarEvent']
+                    icon: icons['IconList']
                 }
             ]
         }

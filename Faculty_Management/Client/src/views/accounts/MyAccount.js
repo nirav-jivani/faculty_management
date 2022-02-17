@@ -178,11 +178,13 @@ const MyAccount = (props, { ...others }) => {
                     <form noValidate onSubmit={handleSubmit} {...others}>
                         <Stack direction="row" justifyContent="center" spacing={2} alignItems="center">
                             <FormControl fullWidth className={classes.loginInput}>
-                                <InputLabel htmlFor="firstname">First Name</InputLabel>
-                                <OutlinedInput
+                                {/* <InputLabel htmlFor="firstname">First Name</InputLabel> */}
+                                <TextField
+                                    variant="standard"
                                     id="firstname"
                                     value={values.firstName}
                                     name="firstName"
+                                    label="First Name"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
                                     disabled={isDisabled}
@@ -196,11 +198,13 @@ const MyAccount = (props, { ...others }) => {
                             </FormControl>
 
                             <FormControl fullWidth className={classes.loginInput}>
-                                <InputLabel htmlFor="middlename">Middle Name</InputLabel>
-                                <OutlinedInput
+                                {/* <InputLabel htmlFor="middlename">Middle Name</InputLabel> */}
+                                <TextField
+                                    variant='standard'
                                     id="middlename"
                                     value={values.middleName}
                                     name="middleName"
+                                    label="Middle Name"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
                                     disabled={isDisabled}
@@ -214,11 +218,13 @@ const MyAccount = (props, { ...others }) => {
                             </FormControl>
 
                             <FormControl fullWidth className={classes.loginInput}>
-                                <InputLabel htmlFor="lastname">Last Name</InputLabel>
-                                <OutlinedInput
+                                {/* <InputLabel htmlFor="lastname">Last Name</InputLabel> */}
+                                <TextField
+                                    variant="standard"
                                     id="lastname"
                                     value={values.lastName}
                                     name="lastName"
+                                    label="Last Name"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
                                     disabled={isDisabled}
@@ -233,12 +239,14 @@ const MyAccount = (props, { ...others }) => {
                         </Stack>
                         <Stack direction="row" spacing={2} alignItems="center">
                             <FormControl fullWidth error={Boolean(touched.email && errors.email)} className={classes.loginInput}>
-                                <InputLabel htmlFor="email">Email</InputLabel>
-                                <OutlinedInput
+                                {/* <InputLabel htmlFor="email">Email</InputLabel> */}
+                                <TextField
+                                    variant="standard"
                                     id="email"
                                     type="email"
                                     value={values.email}
                                     name="email"
+                                    label="Email"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
                                     disabled={isDisabled}
@@ -257,12 +265,14 @@ const MyAccount = (props, { ...others }) => {
                                 )}
                             </FormControl>
                             <FormControl fullWidth className={classes.loginInput}>
-                                <InputLabel htmlFor="birthDate">Birth Date</InputLabel>
-                                <OutlinedInput
+                                {/* <InputLabel htmlFor="birthDate">Birth Date</InputLabel> */}
+                                <TextField
+                                    variant="standard"
                                     id="birthDate"
                                     type="date"
                                     value={values.birthDate}
                                     name="birthDate"
+                                    label="Birth Date"
                                     onChange={handleChange}
                                     disabled={isDisabled}
                                     inputProps={{
@@ -276,11 +286,13 @@ const MyAccount = (props, { ...others }) => {
                         {isDisabled && (
                             <Stack direction="row" spacing={2} alignItems="center">
                                 <FormControl fullWidth className={classes.loginInput}>
-                                    <InputLabel htmlFor="designation">Designation</InputLabel>
-                                    <OutlinedInput
+                                    {/* <InputLabel htmlFor="designation">Designation</InputLabel> */}
+                                    <TextField
+                                        variant="standard"
                                         id="designation"
                                         value={values.designation}
                                         name="designation"
+                                        label="Designation"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
                                         disabled={isDisabled}
@@ -294,11 +306,13 @@ const MyAccount = (props, { ...others }) => {
                                 </FormControl>
 
                                 <FormControl fullWidth className={classes.loginInput}>
-                                    <InputLabel htmlFor="department">Department</InputLabel>
-                                    <OutlinedInput
+                                    {/* <InputLabel htmlFor="department">Department</InputLabel> */}
+                                    <TextField
+                                        variant="standard"
                                         id="department"
                                         value={values.department}
                                         name="department"
+                                        label="Department"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
                                         disabled={isDisabled}
@@ -311,12 +325,14 @@ const MyAccount = (props, { ...others }) => {
                                     />
                                 </FormControl>
                                 <FormControl fullWidth error={Boolean(touched.joinDate && errors.joinDate)} className={classes.loginInput}>
-                                    <InputLabel htmlFor="outlined-adornment-password-login">Join Date</InputLabel>
-                                    <OutlinedInput
+                                    {/* <InputLabel htmlFor="outlined-adornment-password-login">Join Date</InputLabel> */}
+                                    <TextField
+                                        variant="standard"
                                         id="outlined-adornment-password-login"
                                         type="date"
                                         value={values.joinDate}
                                         name="joinDate"
+                                        label="Join Date"
                                         onChange={handleChange}
                                         disabled={isDisabled}
                                         inputProps={{
@@ -336,12 +352,14 @@ const MyAccount = (props, { ...others }) => {
                         )}
                         <Stack direction="row" spacing={2} alignItems="center">
                             <FormControl fullWidth className={classes.loginInput}>
-                                <InputLabel htmlFor="yoe">Year Of Experience</InputLabel>
-                                <OutlinedInput
+                                {/* <InputLabel htmlFor="yoe">Year Of Experience</InputLabel> */}
+                                <TextField
+                                    variant="standard"
                                     id="yoe"
                                     value={values.yoe}
                                     type="number"
                                     name="yoe"
+                                    label="Year Of Experience"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
                                     disabled={isDisabled}
@@ -354,8 +372,10 @@ const MyAccount = (props, { ...others }) => {
                                 />
                             </FormControl>
                             <FormControl fullWidth className={classes.loginInput}>
-                                <InputLabel htmlFor="qualification">Qualification</InputLabel>
-                                <OutlinedInput
+                                {/* <InputLabel htmlFor="qualification">Qualification</InputLabel> */}
+                                <TextField
+                                    variant="standard"
+                                    label="Qualification"
                                     id="qualification"
                                     value={values.qualification}
                                     name="qualification"

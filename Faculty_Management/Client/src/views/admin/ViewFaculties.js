@@ -35,12 +35,12 @@ const ViewEmployees = () => {
     }, []);
 
     const columns = [
-        { field: 'Username', headerName: 'Email', width: 230 },
-        { field: 'FirstName', headerName: 'First name', width: 250 },
-        { field: 'LastName', headerName: 'Last name', width: 250 },
-        { field: 'DeptName', headerName: 'Department', width: 250 },
-        { field: 'Designation', headerName: 'Designation', width: 250 },
-        { field: 'JoinDate', headerName: 'Join Date', width: 230 }
+        { field: 'Username', headerName: 'Email', flex: 1 },
+        { field: 'FirstName', headerName: 'First name', flex: 1 },
+        { field: 'LastName', headerName: 'Last name', flex: 1 },
+        { field: 'DeptName', headerName: 'Department', flex: 1 },
+        { field: 'Designation', headerName: 'Designation', flex: 1 },
+        { field: 'JoinDate', headerName: 'Join Date', flex: 1 }
     ];
     return (
         <>
@@ -56,9 +56,10 @@ const ViewEmployees = () => {
                     <DataGrid
                         rows={employees}
                         columns={columns}
-                        pageSize={10}
                         textAlign="center"
-                        rowsPerPageOptions={[10]}
+                        pageSize={5}
+                        rowsPerPageOptions={[5]}
+                        rowCount={100}
                         checkboxSelection
                     />
                 </div>

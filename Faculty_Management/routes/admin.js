@@ -32,7 +32,7 @@ router.post("/add-faculty", authenticateUser, async (req, res) => {
       from: EMAIL,
       to: data.email,
       subject: "DDU USER ACCOUNT PASSWORD",
-      text: `Congratulations , you are registered into ddu.\n\nUsername : ${data.email} \n Password : ${Password}`,
+      text: `Congratulations , you are registered into ddu.\n\nUsername : ${data.email} \nPassword : ${Password}`,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {

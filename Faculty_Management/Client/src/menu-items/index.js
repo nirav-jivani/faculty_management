@@ -11,7 +11,7 @@ import { Accounts } from './Accounts';
 // const user = JSON.parse(account.user);
 // console.log(account);
 const menuItems = {
-    items: [dashboard, Admin, Events, Publications, Accounts]
+    items: [dashboard, Admin, Events, Accounts]
 };
 
 export default menuItems;
