@@ -1,5 +1,6 @@
 import { React, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+
+import { Link, useLocation, useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { format } from 'date-fns';
 // material-ui
@@ -76,16 +77,21 @@ const useStyles = makeStyles((theme) => ({
 
 //============================|| API JWT - LOGIN ||============================//
 
-const EventAttended = (props, { ...others }) => {
+const AddOrUpdateEvent = (props, { ...others }) => {
     const classes = useStyles();
+    const history = useHistory();
+    const location = useLocation();
     const scriptedRef = useScriptRef();
+    const [passData, setPassData] = useState(location.state);
     const account = useSelector((state) => state.account);
-    const [deptList, setDeptList] = useState([]);
-    const [designationList, setDesignationList] = useState([]);
-    const passData = props.passData;
+    const [file, setFile] = useState();
+
+    const onFileChange = (event) => {
+        setFile(event.target.files[0]);
+    };
 
     return (
-        <>
+        <MainCard title={(passData ? 'Update' : 'Add') + ' Event (Attended)'}>
             <Formik
                 initialValues={{
                     id: passData ? passData.id : '',
@@ -102,8 +108,7 @@ const EventAttended = (props, { ...others }) => {
                     otherType: passData ? passData.OtherType : '',
                     mode: passData ? passData.EventMode : 'Online',
                     academicYear: passData ? passData.AcedemicYear : '',
-                    approvedBy: passData ? passData.ApprovedBy : '',
-                    file: null
+                    approvedBy: passData ? passData.ApprovedBy : ''
                 }}
                 validationSchema={Yup.object().shape({
                     title: Yup.string().required('Event Title is required'),
@@ -119,29 +124,30 @@ const EventAttended = (props, { ...others }) => {
                 })}
                 onSubmit={(values, { setErrors, setStatus, setSubmitting }) => {
                     try {
+                        const formData = new FormData();
+                        formData.append('myfile', file);
+                        formData.append(
+                            'data',
+                            JSON.stringify({
+                                id: values.id,
+                                title: values.title,
+                                organizedBy: values.organizedBy,
+                                organizedAt: values.organizedAt,
+                                fromDate: values.fromDate,
+                                toDate: values.toDate,
+                                duration: values.duration,
+                                speakerName: values.speakerName,
+                                topic: values.topic,
+                                level: values.level,
+                                type: values.type,
+                                otherType: values.otherType,
+                                mode: values.mode,
+                                academicYear: values.academicYear,
+                                approvedBy: values.approvedBy
+                            })
+                        );
                         axios
-                            .post(
-                                configData.API_SERVER + 'events/event-attended',
-                                {
-                                    id: values.id,
-                                    title: values.title,
-                                    organizedBy: values.organizedBy,
-                                    organizedAt: values.organizedAt,
-                                    fromDate: values.fromDate,
-                                    toDate: values.toDate,
-                                    duration: values.duration,
-                                    speakerName: values.speakerName,
-                                    topic: values.topic,
-                                    level: values.level,
-                                    type: values.type,
-                                    otherType: values.otherType,
-                                    mode: values.mode,
-                                    academicYear: values.academicYear,
-                                    approvedBy: values.approvedBy,
-                                    file: null
-                                },
-                                { headers: { 'x-auth-token': account.token } }
-                            )
+                            .post(configData.API_SERVER + 'events/event-attended', formData, { headers: { 'x-auth-token': account.token } })
                             .then(function (response) {
                                 if (response.data.success) {
                                     console.log('success');
@@ -150,7 +156,7 @@ const EventAttended = (props, { ...others }) => {
                                         setStatus({ success: true });
                                         setSubmitting(false);
                                     }
-                                    props.changeFunc();
+                                    history.push('/event-attended/view-events');
                                 } else {
                                     setStatus({ success: false });
                                     setErrors({ submit: response.data.msg });
@@ -173,7 +179,7 @@ const EventAttended = (props, { ...others }) => {
                 }}
             >
                 {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
-                    <form noValidate onSubmit={handleSubmit} {...others}>
+                    <form noValidate encType="multipart/form-data" onSubmit={handleSubmit} {...others}>
                         <TextField
                             fullWidth
                             margin="normal"
@@ -380,7 +386,7 @@ const EventAttended = (props, { ...others }) => {
                             label="Scanned Copy of Certificate"
                             name="file"
                             InputLabelProps={{ shrink: true }}
-                            onChange={handleChange}
+                            onChange={onFileChange}
                             type="file"
                         />
 
@@ -413,8 +419,8 @@ const EventAttended = (props, { ...others }) => {
                     </form>
                 )}
             </Formik>
-        </>
+        </MainCard>
     );
 };
 
-export default EventAttended;
+export default AddOrUpdateEvent;

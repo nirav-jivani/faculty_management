@@ -19,7 +19,9 @@ const UtilsTablerIcons = Loadable(lazy(() => import('../views/utilities/TablerIc
 const cards = Loadable(lazy(() => import('../views/utilities/cards')));
 
 // sample page routing
-const EventAttended = Loadable(lazy(() => import('../views/events/event-attended/EventAttended')));
+const ViewEvents = Loadable(lazy(() => import('../views/events/event-attended/ViewEvents')));
+
+const AddOrUpdateEvent = Loadable(lazy(() => import('../views/events/event-attended/AddOrUpdateEvent')));
 
 const AddFaculty = Loadable(lazy(() => import('../views/admin/AddFaculty')));
 
@@ -31,7 +33,7 @@ const MyAccount = Loadable(lazy(() => import('../views/accounts/MyAccount')));
 
 const MainRoutes = () => {
     const location = useLocation();
-
+    // location.state = null;
     return (
         <Route
             path={[
@@ -46,7 +48,9 @@ const MainRoutes = () => {
                 '/icons/cards',
                 '/admin/add-faculty',
                 '/admin/view-faculties',
-                '/events/event-attended',
+                '/event-attended/add-event',
+                '/event-attended/view-events',
+                '/event-attended/update-event',
                 '/accounts/my-account'
             ]}
         >
@@ -63,7 +67,9 @@ const MainRoutes = () => {
                         <Route path="/icons/cards" component={cards} />
                         <Route path="/admin/add-faculty" component={AddFaculty} />
                         <Route path="/admin/view-faculties" component={ViewFaculties} />
-                        <Route path="/events/event-attended" component={EventAttended} />
+                        <Route path="/event-attended/add-event" component={AddOrUpdateEvent} />
+                        <Route path="/event-attended/update-event" component={AddOrUpdateEvent} />
+                        <Route path="/event-attended/view-events" component={ViewEvents} />
                         <Route path="/home/index" component={Home} />
                         <Route path="/accounts/my-account" component={MyAccount} />
                     </AuthGuard>
