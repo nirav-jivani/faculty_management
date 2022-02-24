@@ -1,21 +1,18 @@
 import { React, useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import FileViewer from 'react-file-viewer';
+import { useSelector } from 'react-redux';
 
 // material-ui
 import { useConfirm } from 'material-ui-confirm';
-import MuiTypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/styles';
 import { DataGrid } from '@material-ui/data-grid';
-import { Link, FormControlLabel, Switch, FormGroup, Button, Stack } from '@material-ui/core';
+import { Button, Stack } from '@material-ui/core';
+
 // project imports
 import configData from './../../../config';
 import MainCard from './../../../ui-component/cards/MainCard';
-import { gridSpacing } from './../../../store/constant';
-// import EventForm from './../forms/EventForm';
-import axios from 'axios';
 
-import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
     root: {

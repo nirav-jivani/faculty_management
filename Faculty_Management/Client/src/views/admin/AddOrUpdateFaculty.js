@@ -1,25 +1,20 @@
 import { React, useEffect, useState } from 'react';
-import { Link, useLocation, useHistory } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { format } from 'date-fns';
+
 // material-ui
 import { makeStyles } from '@material-ui/styles';
-
 import {
     Box,
     TextField,
     MenuItem,
     Button,
-    Checkbox,
     FormControl,
-    FormControlLabel,
     FormHelperText,
-    IconButton,
-    InputAdornment,
     InputLabel,
     OutlinedInput,
     Stack,
-    Typography
 } from '@material-ui/core';
 
 // third party
@@ -28,7 +23,6 @@ import { Formik } from 'formik';
 import axios from 'axios';
 
 // project imports
-import MyAlert from './../../ui-component/MyAlert';
 import MainCard from './../../ui-component/cards/MainCard';
 import configData from '../../config';
 import useScriptRef from '../../hooks/useScriptRef';
@@ -79,8 +73,8 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
     const history = useHistory();
     const scriptedRef = useScriptRef();
     const location = useLocation();
-
     const account = useSelector((state) => state.account);
+
     const [deptList, setDeptList] = useState([]);
     const [designationList, setDesignationList] = useState([]);
     const [employee, setEmployee] = useState(location.state);
@@ -95,6 +89,7 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                 }
             });
     }, []);
+
     return (
         <MainCard title={(employee ? 'Edit' : 'Add') + ' Faculty'}>
             <Formik
@@ -121,7 +116,7 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                                     id: employee ? employee.id : '',
                                     joinDate: values.joinDate,
                                     email: values.email,
-                                    oldEmail: employee.Username,
+                                    oldEmail: employee ? employee.Username : '',
                                     department: values.department,
                                     designation: values.designation,
                                     firstName: values.firstName,
@@ -169,7 +164,6 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                                     name="firstName"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
-                                    // disabled={isDisabled}
                                     inputProps={{
                                         classes: {
                                             className: classes.placeHolder,
@@ -187,7 +181,6 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                                     name="lastName"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
-                                    // disabled={isDisabled}
                                     inputProps={{
                                         classes: {
                                             className: classes.placeHolder,
@@ -198,9 +191,9 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                             </FormControl>
                         </Stack>
                         <FormControl fullWidth error={Boolean(touched.email && errors.email)} className={classes.loginInput}>
-                            <InputLabel htmlFor="outlined-adornment-email-login">Email</InputLabel>
+                            <InputLabel htmlFor="email">Email</InputLabel>
                             <OutlinedInput
-                                id="outlined-adornment-email-login"
+                                id="email"
                                 type="email"
                                 value={values.email}
                                 name="email"
@@ -215,7 +208,7 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                                 }}
                             />
                             {touched.email && errors.email && (
-                                <FormHelperText error id="standard-weight-helper-text-email-login">
+                                <FormHelperText error id="email-error">
                                     {' '}
                                     {errors.email}{' '}
                                 </FormHelperText>
@@ -226,7 +219,6 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                             select
                             InputLabelProps={{ shrink: true }}
                             error={Boolean(touched.department && errors.department)}
-                            id="department"
                             value={values.department}
                             name="department"
                             label="Department"
@@ -247,7 +239,7 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                             ))}
                         </TextField>
                         {touched.department && errors.department && (
-                            <FormHelperText error id="standard-weight-helper-text-email-login">
+                            <FormHelperText error id="department-error">
                                 {' '}
                                 {errors.department}{' '}
                             </FormHelperText>
@@ -257,7 +249,6 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                             select
                             InputLabelProps={{ shrink: true }}
                             error={Boolean(touched.designation && errors.designation)}
-                            id="designation"
                             value={values.designation}
                             name="designation"
                             label="Designation"
@@ -278,16 +269,16 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                             ))}
                         </TextField>
                         {touched.designation && errors.designation && (
-                            <FormHelperText error id="standard-weight-helper-text-email-login">
+                            <FormHelperText error id="designation-error">
                                 {' '}
                                 {errors.designation}{' '}
                             </FormHelperText>
                         )}
 
                         <FormControl error={Boolean(touched.joinDate && errors.joinDate)} className={classes.loginInput}>
-                            <InputLabel htmlFor="outlined-adornment-password-login">Join Date</InputLabel>
+                            <InputLabel htmlFor="join-date">Join Date</InputLabel>
                             <OutlinedInput
-                                id="outlined-adornment-password-login"
+                                id="join-date"
                                 type="date"
                                 value={values.joinDate}
                                 name="joinDate"
@@ -299,7 +290,7 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                                 }}
                             />
                             {touched.joinDate && errors.joinDate && (
-                                <FormHelperText error id="standard-weight-helper-text-password-login">
+                                <FormHelperText error id="join-date-error">
                                     {' '}
                                     {errors.joinDate}{' '}
                                 </FormHelperText>

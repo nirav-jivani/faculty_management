@@ -1,25 +1,21 @@
 import React from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-
-import configData from '../../config';
 
 // material-ui
 import { makeStyles } from '@material-ui/styles';
 import {
     Box,
     Button,
-    Checkbox,
     FormControl,
-    FormControlLabel,
     FormHelperText,
     IconButton,
     InputAdornment,
     InputLabel,
     OutlinedInput,
-    Stack,
-    Typography
 } from '@material-ui/core';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
 // third party
 import * as Yup from 'yup';
@@ -27,13 +23,10 @@ import { Formik } from 'formik';
 import axios from 'axios';
 
 // project imports
+import configData from '../../config';
 import useScriptRef from '../../hooks/useScriptRef';
 import AnimateButton from '../../ui-component/extended/AnimateButton';
-import { ACCOUNT_INITIALIZE, LOGOUT } from './../../store/actions';
-
-// assets
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import { LOGOUT } from './../../store/actions';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -79,36 +72,25 @@ const useStyles = makeStyles((theme) => ({
 const ChangePassword = (props, { ...others }) => {
     const classes = useStyles();
     const history = useHistory();
+    console.log(props)
     const dispatcher = useDispatch();
     const scriptedRef = useScriptRef();
     const account = useSelector((state) => state.account);
 
-    const [showPassword, setShowPassword] = React.useState(false);
-    const [showPassword1, setShowPassword1] = React.useState(false);
-    const [showPassword2, setShowPassword2] = React.useState(false);
+    const [showOldPassword, setShowOldPassword] = React.useState(false);
+    const [showNewPassword, setShowNewPassword] = React.useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
-    const handleClickShowPassword = () => {
-        setShowPassword(!showPassword);
+    const handleClickShowOldPassword = () => {
+        setShowOldPassword(!showOldPassword);
     };
 
-    const handleMouseDownPassword = (event) => {
-        event.preventDefault();
+    const handleClickShowNewPassword = () => {
+        setShowNewPassword(!showNewPassword);
     };
 
-    const handleClickShowPassword1 = () => {
-        setShowPassword1(!showPassword1);
-    };
-
-    const handleMouseDownPassword1 = (event) => {
-        event.preventDefault();
-    };
-
-    const handleClickShowPassword2 = () => {
-        setShowPassword2(!showPassword2);
-    };
-
-    const handleMouseDownPassword2 = (event) => {
-        event.preventDefault();
+    const handleClickShowConfirmPassword = () => {
+        setShowConfirmPassword(!showConfirmPassword);
     };
 
     return (
@@ -140,7 +122,7 @@ const ChangePassword = (props, { ...others }) => {
                             )
                             .then(function (response) {
                                 if (response.data.success) {
-                                    window.alert('Passwod Updated Sucessfully..');
+                                    props.setAlertMessage('Passwod Updated Sucessfully');
                                     dispatcher({ type: LOGOUT });
                                     if (scriptedRef.current) {
                                         setStatus({ success: true });
@@ -174,7 +156,7 @@ const ChangePassword = (props, { ...others }) => {
                             <InputLabel htmlFor="old-password">Old Password</InputLabel>
                             <OutlinedInput
                                 id="old-password"
-                                type={showPassword ? 'text' : 'password'}
+                                type={showOldPassword ? 'text' : 'password'}
                                 value={values.oldPassword}
                                 name="oldPassword"
                                 onBlur={handleBlur}
@@ -183,11 +165,10 @@ const ChangePassword = (props, { ...others }) => {
                                     <InputAdornment position="end">
                                         <IconButton
                                             aria-label="toggle password visibility"
-                                            onClick={handleClickShowPassword}
-                                            onMouseDown={handleMouseDownPassword}
+                                            onClick={handleClickShowOldPassword}
                                             edge="end"
                                         >
-                                            {showPassword ? <Visibility /> : <VisibilityOff />}
+                                            {showOldPassword ? <Visibility /> : <VisibilityOff />}
                                         </IconButton>
                                     </InputAdornment>
                                 }
@@ -209,7 +190,7 @@ const ChangePassword = (props, { ...others }) => {
                             <InputLabel htmlFor="new-password">New Password</InputLabel>
                             <OutlinedInput
                                 id="new-password"
-                                type={showPassword1 ? 'text' : 'password'}
+                                type={showNewPassword ? 'text' : 'password'}
                                 value={values.newPassword}
                                 name="newPassword"
                                 onBlur={handleBlur}
@@ -218,11 +199,10 @@ const ChangePassword = (props, { ...others }) => {
                                     <InputAdornment position="end">
                                         <IconButton
                                             aria-label="toggle password visibility"
-                                            onClick={handleClickShowPassword1}
-                                            onMouseDown={handleMouseDownPassword}
+                                            onClick={handleClickShowNewPassword}
                                             edge="end"
                                         >
-                                            {showPassword1 ? <Visibility /> : <VisibilityOff />}
+                                            {showNewPassword ? <Visibility /> : <VisibilityOff />}
                                         </IconButton>
                                     </InputAdornment>
                                 }
@@ -248,7 +228,7 @@ const ChangePassword = (props, { ...others }) => {
                             <InputLabel htmlFor="confirm-password">Confirm Password</InputLabel>
                             <OutlinedInput
                                 id="confirm-password"
-                                type={showPassword2 ? 'text' : 'password'}
+                                type={showConfirmPassword ? 'text' : 'password'}
                                 value={values.confirmPassword}
                                 name="confirmPassword"
                                 onBlur={handleBlur}
@@ -257,11 +237,10 @@ const ChangePassword = (props, { ...others }) => {
                                     <InputAdornment position="end">
                                         <IconButton
                                             aria-label="toggle password visibility"
-                                            onClick={handleClickShowPassword2}
-                                            onMouseDown={handleMouseDownPassword}
+                                            onClick={handleClickShowConfirmPassword}
                                             edge="end"
                                         >
-                                            {showPassword2 ? <Visibility /> : <VisibilityOff />}
+                                            {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
                                         </IconButton>
                                     </InputAdornment>
                                 }

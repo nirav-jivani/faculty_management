@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { format } from 'date-fns';
 
@@ -20,12 +20,13 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const ViewEmployees = (props) => {
+const ViewEmployees = () => {
+
     const [selectedEmployee, setSelectedEmployee] = useState([]);
-    const account = useSelector((state) => state.account);
     const [employees, setEmployees] = useState([]);
     const [isWorking, setIsWorking] = useState(true);
-
+    
+    const account = useSelector((state) => state.account);
     const classes = useStyles();
     const history = useHistory();
     const confirm = useConfirm();
@@ -52,6 +53,7 @@ const ViewEmployees = (props) => {
         });
         history.push({ pathname: '/admin/edit-faculty', state: employee, replace: true });
     };
+
     const onDeleteClick = () => {
         const employee = employees.find((e) => {
             return e.id === selectedEmployee[0];
@@ -120,7 +122,6 @@ const ViewEmployees = (props) => {
                             if (selection.length > 1) {
                                 const selectionSet = new Set(selectedEmployee);
                                 const result = selection.filter((s) => !selectionSet.has(s));
-
                                 setSelectedEmployee(result);
                             } else {
                                 setSelectedEmployee(selection);

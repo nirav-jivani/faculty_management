@@ -39,8 +39,7 @@ router.post("/add-faculty", authenticateUser, async (req, res) => {
         subject: "DDU USER ACCOUNT PASSWORD",
         text: `Congratulations , you are registered into ddu.\n\nUsername : ${data.email} \nPassword : ${Password}`,
       };
-
-      if (facultyExist[0][0] === []) {
+      if (facultyExist[0].length == 0) {
         let salt = await bcrypt.genSalt(10);
         const password = await bcrypt.hash(Password, salt);
         response = await db
@@ -63,7 +62,7 @@ router.post("/add-faculty", authenticateUser, async (req, res) => {
     } else {
       if (
         data.oldEmail === facultyExist[0][0].Username ||
-        facultyExist[0][0] == []
+        facultyExist[0].length == 0
       ) {
         mailOptions = {
           from: EMAIL,
@@ -90,7 +89,6 @@ router.post("/add-faculty", authenticateUser, async (req, res) => {
         response = false;
       }
     }
-
     if (Boolean(response)) {
       transporter.sendMail(mailOptions, function (error, info) {
         if (error) {

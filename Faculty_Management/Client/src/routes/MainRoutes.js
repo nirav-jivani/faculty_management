@@ -19,25 +19,24 @@ const form_elements = Loadable(lazy(() => import('../views/utilities/form_elemen
 const UtilsTablerIcons = Loadable(lazy(() => import('../views/utilities/TablerIcons')));
 const cards = Loadable(lazy(() => import('../views/utilities/cards')));
 
-// sample page routing
-const ViewEventsForAttended = Loadable(lazy(() => import('../views/events/event-attended/ViewEvents')));
+const Home = Loadable(lazy(() => import('../views/Home')));
 
+const ViewEventsForAttended = Loadable(lazy(() => import('../views/events/event-attended/ViewEvents')));
 const AddOrUpdateEventForAttended = Loadable(lazy(() => import('../views/events/event-attended/AddOrUpdateEvent')));
 
 const ViewEventsForConducted = Loadable(lazy(() => import('../views/events/event-conducted/ViewEvents')));
-
 const AddOrUpdateEventForConducted = Loadable(lazy(() => import('../views/events/event-conducted/AddOrUpdateEvent')));
 
 const ViewEventsForOrganized = Loadable(lazy(() => import('../views/events/event-organized/ViewEvents')));
-
 const AddOrUpdateEventForOrganized = Loadable(lazy(() => import('../views/events/event-organized/AddOrUpdateEvent')));
 
 const AddOrUpdateFaculty = Loadable(lazy(() => import('../views/admin/AddOrUpdateFaculty')));
-
 const ViewFaculties = Loadable(lazy(() => import('../views/admin/ViewFaculties')));
-// const PastFaculties = Loadable(lazy(() => import('../views/admin/PastFaculties')));
-const Home = Loadable(lazy(() => import('../views/Home')));
+
 const MyAccount = Loadable(lazy(() => import('../views/accounts/MyAccount')));
+
+const AddResearchPaper = Loadable(lazy(() => import('../views/publications/AddResearchPaper')));
+
 //-----------------------|| MAIN ROUTING ||-----------------------//
 
 const MainRoutes = () => {
@@ -57,20 +56,26 @@ const MainRoutes = () => {
                 '/icons/form_elements',
                 '/icons/material-icons',
                 '/icons/cards',
+
                 '/admin/add-faculty',
                 '/admin/edit-faculty',
                 '/admin/view-faculties',
+                
+                '/accounts/my-account',
+                
                 '/event-attended/add-event',
                 '/event-attended/view-events',
                 '/event-attended/update-event',
+                
                 '/event-conducted/add-event',
                 '/event-conducted/view-events',
                 '/event-conducted/update-event',
+                
                 '/event-organized/add-event',
                 '/event-organized/view-events',
                 '/event-organized/update-event',
 
-                '/accounts/my-account'
+                '/publications/add-research-paper'
             ]}
         >
             {alertMessage !== '' && <MyAlert message={alertMessage} setMessage={setAlertMessage} />}
@@ -85,9 +90,14 @@ const MainRoutes = () => {
                         <Route path="/icons/material-icons" render={UtilsMaterialIcons} />
                         <Route path="/icons/form_elements" render={form_elements} />
                         <Route path="/icons/cards" render={cards} />
+                        <Route path="/home/index" render={Home} />
+                        
                         <Route path="/admin/add-faculty" render={() => <AddOrUpdateFaculty setAlertMessage={setAlertMessage} />} />
                         <Route path="/admin/edit-faculty" render={() => <AddOrUpdateFaculty setAlertMessage={setAlertMessage} />} />
                         <Route path="/admin/view-faculties" render={() => <ViewFaculties setAlertMessage={setAlertMessage} />} />
+                        
+                        <Route path="/accounts/my-account" render={() => <MyAccount setAlertMessage={setAlertMessage} />} />
+                        
                         <Route
                             path="/event-attended/add-event"
                             render={() => <AddOrUpdateEventForAttended setAlertMessage={setAlertMessage} />}
@@ -117,8 +127,8 @@ const MainRoutes = () => {
                             render={() => <AddOrUpdateEventForOrganized setAlertMessage={setAlertMessage} />}
                         />
                         <Route path="/event-organized/view-events" render={ViewEventsForOrganized} />
-                        <Route path="/home/index" render={Home} />
-                        <Route path="/accounts/my-account" render={() => <MyAccount setAlertMessage={setAlertMessage} />} />
+                        
+                        <Route path="/publications/add-research-paper" render={AddResearchPaper} />
                     </AuthGuard>
                 </Switch>
             </MainLayout>

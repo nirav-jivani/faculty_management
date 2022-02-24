@@ -231,6 +231,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             margin="normal"
                             type="date"
                             label="From Date"
+                            InputLabelProps={{ shrink: true }}
                             error={Boolean(touched.fromDate && errors.fromDate)}
                             name="fromDate"
                             value={values.fromDate}
@@ -247,6 +248,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             margin="normal"
                             type="date"
                             label="To Date"
+                            InputLabelProps={{ shrink: true }}
                             error={Boolean(touched.toDate && errors.toDate)}
                             name="toDate"
                             value={values.toDate}

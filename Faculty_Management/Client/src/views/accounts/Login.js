@@ -1,25 +1,20 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-
-import configData from '../../config';
 
 // material-ui
 import { makeStyles } from '@material-ui/styles';
 import {
     Box,
     Button,
-    Checkbox,
     FormControl,
-    FormControlLabel,
     FormHelperText,
     IconButton,
     InputAdornment,
     InputLabel,
     OutlinedInput,
-    Stack,
-    Typography
 } from '@material-ui/core';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
 // third party
 import * as Yup from 'yup';
@@ -27,13 +22,10 @@ import { Formik } from 'formik';
 import axios from 'axios';
 
 // project imports
+import configData from '../../config';
 import useScriptRef from '../../hooks/useScriptRef';
 import AnimateButton from '../../ui-component/extended/AnimateButton';
 import { ACCOUNT_INITIALIZE } from './../../store/actions';
-
-// assets
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -76,20 +68,15 @@ const useStyles = makeStyles((theme) => ({
 
 //============================|| API JWT - LOGIN ||============================//
 
-const Login = (props, { ...others }) => {
+const Login = ({ ...others }) => {
+    
     const classes = useStyles();
     const dispatcher = useDispatch();
-
     const scriptedRef = useScriptRef();
-    const [checked, setChecked] = React.useState(true);
 
     const [showPassword, setShowPassword] = React.useState(false);
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
-    };
-
-    const handleMouseDownPassword = (event) => {
-        event.preventDefault();
     };
 
     return (
@@ -146,15 +133,14 @@ const Login = (props, { ...others }) => {
                 {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                     <form noValidate onSubmit={handleSubmit} {...others}>
                         <FormControl fullWidth error={Boolean(touched.email && errors.email)} className={classes.loginInput}>
-                            <InputLabel htmlFor="outlined-adornment-email-login">Email</InputLabel>
+                            <InputLabel htmlFor="email">Email</InputLabel>
                             <OutlinedInput
-                                id="outlined-adornment-email-login"
+                                id="email"
                                 type="email"
                                 value={values.email}
                                 name="email"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
-                                label="Email Address"
                                 inputProps={{
                                     classes: {
                                         notchedOutline: classes.notchedOutline
@@ -162,7 +148,7 @@ const Login = (props, { ...others }) => {
                                 }}
                             />
                             {touched.email && errors.email && (
-                                <FormHelperText error id="standard-weight-helper-text-email-login">
+                                <FormHelperText error id="email-error">
                                     {' '}
                                     {errors.email}{' '}
                                 </FormHelperText>
@@ -170,9 +156,9 @@ const Login = (props, { ...others }) => {
                         </FormControl>
 
                         <FormControl fullWidth error={Boolean(touched.password && errors.password)} className={classes.loginInput}>
-                            <InputLabel htmlFor="outlined-adornment-password-login">Password</InputLabel>
+                            <InputLabel htmlFor="password">Password</InputLabel>
                             <OutlinedInput
-                                id="outlined-adornment-password-login"
+                                id="password"
                                 type={showPassword ? 'text' : 'password'}
                                 value={values.password}
                                 name="password"
@@ -183,14 +169,12 @@ const Login = (props, { ...others }) => {
                                         <IconButton
                                             aria-label="toggle password visibility"
                                             onClick={handleClickShowPassword}
-                                            // onMouseDown={handleMouseDownPassword}
                                             edge="end"
                                         >
                                             {showPassword ? <Visibility /> : <VisibilityOff />}
                                         </IconButton>
                                     </InputAdornment>
                                 }
-                                label="Password"
                                 inputProps={{
                                     classes: {
                                         notchedOutline: classes.notchedOutline
@@ -198,7 +182,7 @@ const Login = (props, { ...others }) => {
                                 }}
                             />
                             {touched.password && errors.password && (
-                                <FormHelperText error id="standard-weight-helper-text-password-login">
+                                <FormHelperText error id="password-error">
                                     {' '}
                                     {errors.password}{' '}
                                 </FormHelperText>

@@ -1,8 +1,6 @@
-import { React, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { React, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { format } from 'date-fns';
-import { useHistory } from 'react-router';
+
 // material-ui
 import { makeStyles } from '@material-ui/styles';
 
@@ -11,17 +9,11 @@ import {
     RadioGroup,
     Box,
     TextField,
-    MenuItem,
     Button,
-    Checkbox,
     FormControl,
     FormLabel,
     FormControlLabel,
     FormHelperText,
-    IconButton,
-    InputAdornment,
-    InputLabel,
-    OutlinedInput,
     Stack,
     Avatar,
     Typography
@@ -82,12 +74,11 @@ const useStyles = makeStyles((theme) => ({
 
 const MyAccount = (props, { ...others }) => {
     const classes = useStyles();
-    const history = useHistory();
     const scriptedRef = useScriptRef();
     const dispatcher = useDispatch();
     const account = useSelector((state) => state.account);
     const [isDisabled, setIsDisabled] = useState(true);
-    console.log(props);
+
     const stringAvatar = (name) => {
         return {
             children: `${name.split(' ')[0][0] + name.split(' ')[1][0]}`
@@ -113,7 +104,7 @@ const MyAccount = (props, { ...others }) => {
                     birthDate: account.user.BirthDate,
                     gender: account.user.Gender,
                     joinDate: account.user.JoinDate,
-                    yoe: 12,
+                    yoe: account.user.YearOfExperience,
                     department: account.user.DeptName,
                     designation: account.user.Designation,
                     qualification: account.user.Qualification
@@ -178,7 +169,6 @@ const MyAccount = (props, { ...others }) => {
                     <form noValidate onSubmit={handleSubmit} {...others}>
                         <Stack direction="row" justifyContent="center" spacing={2} alignItems="center">
                             <FormControl fullWidth className={classes.loginInput}>
-                                {/* <InputLabel htmlFor="firstname">First Name</InputLabel> */}
                                 <TextField
                                     variant="standard"
                                     id="firstname"
@@ -198,7 +188,6 @@ const MyAccount = (props, { ...others }) => {
                             </FormControl>
 
                             <FormControl fullWidth className={classes.loginInput}>
-                                {/* <InputLabel htmlFor="middlename">Middle Name</InputLabel> */}
                                 <TextField
                                     variant="standard"
                                     id="middlename"
@@ -218,7 +207,6 @@ const MyAccount = (props, { ...others }) => {
                             </FormControl>
 
                             <FormControl fullWidth className={classes.loginInput}>
-                                {/* <InputLabel htmlFor="lastname">Last Name</InputLabel> */}
                                 <TextField
                                     variant="standard"
                                     id="lastname"
@@ -239,7 +227,6 @@ const MyAccount = (props, { ...others }) => {
                         </Stack>
                         <Stack direction="row" spacing={2} alignItems="center">
                             <FormControl fullWidth error={Boolean(touched.email && errors.email)} className={classes.loginInput}>
-                                {/* <InputLabel htmlFor="email">Email</InputLabel> */}
                                 <TextField
                                     variant="standard"
                                     id="email"
@@ -258,20 +245,20 @@ const MyAccount = (props, { ...others }) => {
                                     }}
                                 />
                                 {touched.email && errors.email && (
-                                    <FormHelperText error id="email">
+                                    <FormHelperText error id="email-error">
                                         {' '}
                                         {errors.email}{' '}
                                     </FormHelperText>
                                 )}
                             </FormControl>
                             <FormControl fullWidth className={classes.loginInput}>
-                                {/* <InputLabel htmlFor="birthDate">Birth Date</InputLabel> */}
                                 <TextField
                                     variant="standard"
                                     id="birthDate"
                                     type="date"
                                     value={values.birthDate}
                                     name="birthDate"
+                                    InputLabelProps={{ shrink: true }}
                                     label="Birth Date"
                                     onChange={handleChange}
                                     disabled={isDisabled}
@@ -286,7 +273,6 @@ const MyAccount = (props, { ...others }) => {
                         {isDisabled && (
                             <Stack direction="row" spacing={2} alignItems="center">
                                 <FormControl fullWidth className={classes.loginInput}>
-                                    {/* <InputLabel htmlFor="designation">Designation</InputLabel> */}
                                     <TextField
                                         variant="standard"
                                         id="designation"
@@ -306,7 +292,6 @@ const MyAccount = (props, { ...others }) => {
                                 </FormControl>
 
                                 <FormControl fullWidth className={classes.loginInput}>
-                                    {/* <InputLabel htmlFor="department">Department</InputLabel> */}
                                     <TextField
                                         variant="standard"
                                         id="department"
@@ -325,7 +310,6 @@ const MyAccount = (props, { ...others }) => {
                                     />
                                 </FormControl>
                                 <FormControl fullWidth error={Boolean(touched.joinDate && errors.joinDate)} className={classes.loginInput}>
-                                    {/* <InputLabel htmlFor="outlined-adornment-password-login">Join Date</InputLabel> */}
                                     <TextField
                                         variant="standard"
                                         id="outlined-adornment-password-login"
@@ -333,6 +317,7 @@ const MyAccount = (props, { ...others }) => {
                                         value={values.joinDate}
                                         name="joinDate"
                                         label="Join Date"
+                                        InputLabelProps={{ shrink: true }}
                                         onChange={handleChange}
                                         disabled={isDisabled}
                                         inputProps={{
@@ -342,7 +327,7 @@ const MyAccount = (props, { ...others }) => {
                                         }}
                                     />
                                     {touched.joinDate && errors.joinDate && (
-                                        <FormHelperText error id="standard-weight-helper-text-password-login">
+                                        <FormHelperText error id="join-date-error">
                                             {' '}
                                             {errors.joinDate}{' '}
                                         </FormHelperText>
@@ -372,7 +357,6 @@ const MyAccount = (props, { ...others }) => {
                                 />
                             </FormControl>
                             <FormControl fullWidth className={classes.loginInput}>
-                                {/* <InputLabel htmlFor="qualification">Qualification</InputLabel> */}
                                 <TextField
                                     variant="standard"
                                     label="Qualification"

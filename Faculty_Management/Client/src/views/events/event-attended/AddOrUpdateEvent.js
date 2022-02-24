@@ -1,26 +1,18 @@
-import { React, useEffect, useState } from 'react';
-
-import { Link, useLocation, useHistory } from 'react-router-dom';
+import { React, useState } from 'react';
+import { useLocation, useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { format } from 'date-fns';
+
 // material-ui
 import { makeStyles } from '@material-ui/styles';
 
 import {
     Box,
     TextField,
-    MenuItem,
     Button,
-    Checkbox,
     FormControl,
     FormControlLabel,
     FormHelperText,
-    IconButton,
-    InputAdornment,
-    InputLabel,
-    OutlinedInput,
-    Stack,
-    Typography,
     Radio,
     FormLabel,
     RadioGroup
@@ -35,7 +27,6 @@ import axios from 'axios';
 import MainCard from './../../../ui-component/cards/MainCard';
 import configData from '../../../config';
 import useScriptRef from '../../../hooks/useScriptRef';
-import MyAlert from './../../../ui-component/MyAlert';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -83,7 +74,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
     const location = useLocation();
     const history = useHistory();
     const scriptedRef = useScriptRef();
-    const [event, setPassData] = useState(location.state);
+    const [event, setEvent] = useState(location.state);
     const [file, setFile] = useState();
 
     const account = useSelector((state) => state.account);
@@ -192,7 +183,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             onChange={handleChange}
                         />
                         {touched.title && errors.title && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="title-error">
                                 {' '}
                                 {errors.title}{' '}
                             </FormHelperText>
@@ -207,7 +198,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             onChange={handleChange}
                         />
                         {touched.organizedBy && errors.organizedBy && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="organized-by-error">
                                 {' '}
                                 {errors.organizedBy}{' '}
                             </FormHelperText>
@@ -223,7 +214,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             onChange={handleChange}
                         />
                         {touched.organizedAt && errors.organizedAt && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="organized-at-error">
                                 {' '}
                                 {errors.organizedAt}{' '}
                             </FormHelperText>
@@ -234,13 +225,14 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             margin="normal"
                             type="date"
                             label="From Date"
+                            InputLabelProps={{ shrink: true }}
                             error={Boolean(touched.fromDate && errors.fromDate)}
                             name="fromDate"
                             value={values.fromDate}
                             onChange={handleChange}
                         />
                         {touched.fromDate && errors.fromDate && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="from-date-error">
                                 {' '}
                                 {errors.fromDate}{' '}
                             </FormHelperText>
@@ -251,13 +243,14 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             margin="normal"
                             type="date"
                             label="To Date"
+                            InputLabelProps={{ shrink: true }}
                             error={Boolean(touched.toDate && errors.toDate)}
                             name="toDate"
                             value={values.toDate}
                             onChange={handleChange}
                         />
                         {touched.toDate && errors.toDate && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="to-date-error">
                                 {' '}
                                 {errors.toDate}{' '}
                             </FormHelperText>
@@ -273,7 +266,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             onChange={handleChange}
                         />
                         {touched.duration && errors.duration && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="duration-error">
                                 {' '}
                                 {errors.duration}{' '}
                             </FormHelperText>
@@ -289,7 +282,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             onChange={handleChange}
                         />
                         {touched.speakerName && errors.speakerName && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="speaker-name-error">
                                 {' '}
                                 {errors.speakerName}{' '}
                             </FormHelperText>
@@ -305,7 +298,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             onChange={handleChange}
                         />
                         {touched.topic && errors.topic && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="topic-error">
                                 {' '}
                                 {errors.topic}{' '}
                             </FormHelperText>
@@ -360,7 +353,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             onChange={handleChange}
                         />
                         {touched.academicYear && errors.academicYear && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="academic-year-error">
                                 {' '}
                                 {errors.academicYear}{' '}
                             </FormHelperText>
@@ -376,7 +369,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             onChange={handleChange}
                         />
                         {touched.approvedBy && errors.approvedBy && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="approved-by-error">
                                 {' '}
                                 {errors.approvedBy}{' '}
                             </FormHelperText>

@@ -1,26 +1,18 @@
-import { React, useEffect, useState } from 'react';
-
-import { Link, useLocation, useHistory } from 'react-router-dom';
+import { React, useState } from 'react';
+import { useLocation, useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { format } from 'date-fns';
+
 // material-ui
 import { makeStyles } from '@material-ui/styles';
 
 import {
     Box,
     TextField,
-    MenuItem,
     Button,
-    Checkbox,
     FormControl,
     FormControlLabel,
     FormHelperText,
-    IconButton,
-    InputAdornment,
-    InputLabel,
-    OutlinedInput,
-    Stack,
-    Typography,
     Radio,
     FormLabel,
     RadioGroup
@@ -32,10 +24,9 @@ import { Formik } from 'formik';
 import axios from 'axios';
 
 // project imports
-import MainCard from './../../../ui-component/cards/MainCard';
-import configData from '../../../config';
-import useScriptRef from '../../../hooks/useScriptRef';
-import MyAlert from './../../../ui-component/MyAlert';
+import MainCard from '../../ui-component/cards/MainCard';
+import configData from '../../config';
+import useScriptRef from '../../hooks/useScriptRef';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -78,32 +69,30 @@ const useStyles = makeStyles((theme) => ({
 
 //============================|| API JWT - LOGIN ||============================//
 
-const AddOrUpdateEvent = (props, { ...others }) => {
+const AddResearchPaper = (props, { ...others }) => {
     const classes = useStyles();
     const location = useLocation();
     const history = useHistory();
     const scriptedRef = useScriptRef();
-    const [event, setPassData] = useState(location.state);
+    const [event, setevent] = useState(location.state);
     const [file, setFile] = useState();
-    const [alertMessage, setAlertMessage] = useState('');
 
     const account = useSelector((state) => state.account);
-
     const onFileChange = (event) => {
         setFile(event.target.files[0]);
     };
 
     return (
-        <MainCard title={(event ? 'Update' : 'Add') + ' Event (Conducted)'}>
+        <MainCard title={(event ? 'Update' : 'Add') + ' Publication'}>
             <Formik
                 initialValues={{
                     title: event ? event.EventTitle : '',
                     organizedBy: event ? event.OrganizedBy : '',
-                    conductedAt: event ? event.ConductedAt : '',
+                    organizedAt: event ? event.OrganizedAt : '',
                     fromDate: event ? format(new Date(event.StartDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
                     toDate: event ? format(new Date(event.EndDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
                     duration: event ? event.Duration : '',
-                    participants: event ? event.TotalParticipants : '',
+                    speakerName: event ? event.SpeakerName : '',
                     topic: event ? event.EventTopic : '',
                     level: event ? event.EventLevel : 'Local',
                     type: event ? event.EventType : 'FDP',
@@ -115,11 +104,11 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                 validationSchema={Yup.object().shape({
                     title: Yup.string().required('Event Title is required'),
                     organizedBy: Yup.string().required('Organized By is required'),
-                    conductedAt: Yup.string().required('Conducted At is required'),
+                    organizedAt: Yup.string().required('Organized At is required'),
                     fromDate: Yup.date().required('From Date is required'),
                     toDate: Yup.date().min(Yup.ref('fromDate'), "To date can't be before From date"),
                     duration: Yup.string().required('Duration is required'),
-                    participants: Yup.string().required('Speaker Name is required'),
+                    speakerName: Yup.string().required('Speaker Name is required'),
                     topic: Yup.string().required('Topic Name is required'),
                     academicYear: Yup.string().required('Academic Year is required'),
                     approvedBy: Yup.string().required('Approved By is required')
@@ -134,11 +123,11 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                                 id: event ? event.id : '',
                                 title: values.title,
                                 organizedBy: values.organizedBy,
-                                conductedAt: values.conductedAt,
+                                organizedAt: values.organizedAt,
                                 fromDate: values.fromDate,
                                 toDate: values.toDate,
                                 duration: values.duration,
-                                participants: values.participants,
+                                speakerName: values.speakerName,
                                 topic: values.topic,
                                 level: values.level,
                                 type: values.type,
@@ -146,22 +135,21 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                                 mode: values.mode,
                                 academicYear: values.academicYear,
                                 approvedBy: values.approvedBy,
-                                ProofPath: event ? event.ProofPath : ''
+                                CertificatePath: event ? event.CertificatePath : ''
                             })
                         );
                         axios
-                            .post(configData.API_SERVER + 'events/add-or-update-event-conducted', formData, {
+                            .post(configData.API_SERVER + 'events/add-or-update-event-attended', formData, {
                                 headers: { 'x-auth-token': account.token }
                             })
                             .then(function (response) {
                                 if (response.data.success) {
-                                    console.log('success');
                                     props.setAlertMessage((event ? 'Updated' : 'Added') + ' Sucessfully');
                                     if (scriptedRef.current) {
                                         setStatus({ success: true });
                                         setSubmitting(false);
                                     }
-                                    history.push('/event-conducted/view-events');
+                                    history.push('/event-attended/view-events');
                                 } else {
                                     setStatus({ success: false });
                                     setErrors({ submit: response.data.msg });
@@ -195,7 +183,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             onChange={handleChange}
                         />
                         {touched.title && errors.title && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="title-error">
                                 {' '}
                                 {errors.title}{' '}
                             </FormHelperText>
@@ -210,7 +198,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             onChange={handleChange}
                         />
                         {touched.organizedBy && errors.organizedBy && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="organized-by-error">
                                 {' '}
                                 {errors.organizedBy}{' '}
                             </FormHelperText>
@@ -219,16 +207,16 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                         <TextField
                             fullWidth
                             margin="normal"
-                            label="Conducted At"
-                            error={Boolean(touched.conductedAt && errors.conductedAt)}
-                            name="conductedAt"
-                            value={values.conductedAt}
+                            label="Organized At"
+                            error={Boolean(touched.organizedAt && errors.organizedAt)}
+                            name="organizedAt"
+                            value={values.organizedAt}
                             onChange={handleChange}
                         />
-                        {touched.conductedAt && errors.conductedAt && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                        {touched.organizedAt && errors.organizedAt && (
+                            <FormHelperText error id="organized-at-error">
                                 {' '}
-                                {errors.conductedAt}{' '}
+                                {errors.organizedAt}{' '}
                             </FormHelperText>
                         )}
 
@@ -237,14 +225,13 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             margin="normal"
                             type="date"
                             label="From Date"
-                            InputLabelProps={{ shrink: true }}
                             error={Boolean(touched.fromDate && errors.fromDate)}
                             name="fromDate"
                             value={values.fromDate}
                             onChange={handleChange}
                         />
                         {touched.fromDate && errors.fromDate && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="from-date-error">
                                 {' '}
                                 {errors.fromDate}{' '}
                             </FormHelperText>
@@ -255,14 +242,13 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             margin="normal"
                             type="date"
                             label="To Date"
-                            InputLabelProps={{ shrink: true }}
                             error={Boolean(touched.toDate && errors.toDate)}
                             name="toDate"
                             value={values.toDate}
                             onChange={handleChange}
                         />
                         {touched.toDate && errors.toDate && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="to-date-error">
                                 {' '}
                                 {errors.toDate}{' '}
                             </FormHelperText>
@@ -278,7 +264,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             onChange={handleChange}
                         />
                         {touched.duration && errors.duration && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="duration-error">
                                 {' '}
                                 {errors.duration}{' '}
                             </FormHelperText>
@@ -287,16 +273,16 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                         <TextField
                             fullWidth
                             margin="normal"
-                            label="Number Of Participants"
-                            error={Boolean(touched.participants && errors.participants)}
-                            name="participants"
-                            value={values.participants}
+                            label="Speaker Of The Event"
+                            error={Boolean(touched.speakerName && errors.speakerName)}
+                            name="speakerName"
+                            value={values.speakerName}
                             onChange={handleChange}
                         />
-                        {touched.participants && errors.participants && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                        {touched.speakerName && errors.speakerName && (
+                            <FormHelperText error id="speaker-name-error">
                                 {' '}
-                                {errors.participants}{' '}
+                                {errors.speakerName}{' '}
                             </FormHelperText>
                         )}
 
@@ -310,7 +296,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             onChange={handleChange}
                         />
                         {touched.topic && errors.topic && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="topic-error">
                                 {' '}
                                 {errors.topic}{' '}
                             </FormHelperText>
@@ -365,7 +351,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             onChange={handleChange}
                         />
                         {touched.academicYear && errors.academicYear && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="academic-year-error">
                                 {' '}
                                 {errors.academicYear}{' '}
                             </FormHelperText>
@@ -381,7 +367,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             onChange={handleChange}
                         />
                         {touched.approvedBy && errors.approvedBy && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
+                            <FormHelperText error id="approved-by-error">
                                 {' '}
                                 {errors.approvedBy}{' '}
                             </FormHelperText>
@@ -390,7 +376,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                         <TextField
                             fullWidth
                             margin="normal"
-                            label="Scanned Copy of Document(If any)"
+                            label="Scanned Copy of Certificate"
                             name="file"
                             InputLabelProps={{ shrink: true }}
                             onChange={onFileChange}
@@ -430,4 +416,4 @@ const AddOrUpdateEvent = (props, { ...others }) => {
     );
 };
 
-export default AddOrUpdateEvent;
+export default AddResearchPaper;

@@ -1,23 +1,13 @@
 // assets
 import {
-    IconCalendarEvent,
-    IconBrandFramer,
-    IconTypography,
-    IconPalette,
-    IconShadow,
-    IconWindmill,
-    IconLayoutGridAdd
+    IconPlus, IconList, IconNews
 } from '@tabler/icons';
 
 // constant
 const icons = {
-    IconCalendarEvent: IconCalendarEvent,
-    IconTypography: IconTypography,
-    IconPalette: IconPalette,
-    IconShadow: IconShadow,
-    IconWindmill: IconWindmill,
-    IconBrandFramer: IconBrandFramer,
-    IconLayoutGridAdd: IconLayoutGridAdd
+    IconPlus : IconPlus,
+    IconList : IconList,
+    IconNews : IconNews
 };
 //-----------------------|| UTILITIES MENU ITEMS ||-----------------------//
 
@@ -29,12 +19,26 @@ export const Publications = {
     children: [
         {
             id: 'research-paper',
-            title: 'Reserch paper',
+            title: 'Reserch Paper',
             type: 'collapse',
-            url: '/utils/util-typography',
-            icon: icons['IconTypography'],
+            icon: icons['IconNews'],
             breadcrumbs: false,
-            children: []
+            children: [
+                {
+                    id: 'add-research-paper',
+                    title: 'Add Research Paper',
+                    type: 'item',
+                    url: '/publications/add-research-paper',
+                    icon: icons['IconPlus']
+                },
+                {
+                    id: 'view-research-papers',
+                    title: 'View Research Paper',
+                    type: 'item',
+                    url: '/publications/view-research-papers',
+                    icon: icons['IconList']
+                }
+            ]
         }
     ]
 };

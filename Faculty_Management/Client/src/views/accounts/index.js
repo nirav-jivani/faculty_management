@@ -6,22 +6,20 @@ import { useTheme } from '@material-ui/core';
 import { Divider, Grid, Stack, Typography, useMediaQuery } from '@material-ui/core';
 
 // project imports
-import AuthWrapper1 from './AuthWrapper1';
+import AuthWrapper from './AuthWrapper';
 import AuthCardWrapper from './AuthCardWrapper';
 import Login from './Login';
 import ChangePassword from './ChangePassword';
 
-// assets
-
 //================================|| LOGIN MAIN ||================================//
 
-const Index = () => {
+const Index = (props) => {
     const theme = useTheme();
     const location = useLocation();
     const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
-        <AuthWrapper1>
+        <AuthWrapper>
             <Grid container direction="column" justifyContent="flex-end" sx={{ minHeight: '100vh' }}>
                 <Grid item xs={12}>
                     <Grid container justifyContent="center" alignItems="center" sx={{ minHeight: 'calc(100vh - 68px)' }}>
@@ -62,7 +60,7 @@ const Index = () => {
                                         </Grid>
                                     )}
                                     <Grid item xs={12}>
-                                        {location.pathname === '/login' ? <Login /> : <ChangePassword />}
+                                        {location.pathname === '/login' ? <Login /> : <ChangePassword setAlertMessage = {props.setAlertMessage}/>}
                                     </Grid>
                                     {location.pathname === '/login' && (
                                         <>
@@ -90,7 +88,7 @@ const Index = () => {
                     </Grid>
                 </Grid>
             </Grid>
-        </AuthWrapper1>
+        </AuthWrapper>
     );
 };
 
