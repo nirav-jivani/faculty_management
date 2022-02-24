@@ -33,6 +33,7 @@ import { Formik } from 'formik';
 import axios from 'axios';
 
 // project imports
+import MyAlert from './../../ui-component/MyAlert';
 import MainCard from './../../ui-component/cards/MainCard';
 import configData from '../../config';
 import useScriptRef from '../../hooks/useScriptRef';
@@ -86,7 +87,7 @@ const MyAccount = (props, { ...others }) => {
     const dispatcher = useDispatch();
     const account = useSelector((state) => state.account);
     const [isDisabled, setIsDisabled] = useState(true);
-
+    console.log(props);
     const stringAvatar = (name) => {
         return {
             children: `${name.split(' ')[0][0] + name.split(' ')[1][0]}`
@@ -145,8 +146,7 @@ const MyAccount = (props, { ...others }) => {
                                             type: ACCOUNT_INITIALIZE,
                                             payload: { isLoggedIn: true, user: response.data.user, token: account.token }
                                         });
-                                        console.log('success');
-                                        window.alert('Updated Sucessfully');
+                                        props.setAlertMessage('Updated Sucessfully');
                                         if (scriptedRef.current) {
                                             setStatus({ success: true });
                                             setSubmitting(false);
@@ -200,7 +200,7 @@ const MyAccount = (props, { ...others }) => {
                             <FormControl fullWidth className={classes.loginInput}>
                                 {/* <InputLabel htmlFor="middlename">Middle Name</InputLabel> */}
                                 <TextField
-                                    variant='standard'
+                                    variant="standard"
                                     id="middlename"
                                     value={values.middleName}
                                     name="middleName"

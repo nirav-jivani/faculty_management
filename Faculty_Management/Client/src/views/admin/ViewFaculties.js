@@ -1,18 +1,34 @@
 import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { format } from 'date-fns';
+
+import { makeStyles } from '@material-ui/styles';
 import { DataGrid } from '@material-ui/data-grid';
+import { useConfirm } from 'material-ui-confirm';
+import { FormControlLabel, Switch, FormGroup, Button, Stack } from '@material-ui/core';
+
 import configData from './../../config';
 import MainCard from '../../ui-component/cards/MainCard';
-import { format } from 'date-fns';
-import { useSelector } from 'react-redux';
-
-import { FormControlLabel, Switch, FormGroup, Button } from '@material-ui/core';
 
 const axios = require('axios');
+const useStyles = makeStyles((theme) => ({
+    root: {
+        '& .MuiDataGrid-columnHeaderCheckbox .MuiDataGrid-columnHeaderTitleContainer': {
+            display: 'none'
+        }
+    }
+}));
 
-const ViewEmployees = () => {
+const ViewEmployees = (props) => {
+    const [selectedEmployee, setSelectedEmployee] = useState([]);
     const account = useSelector((state) => state.account);
     const [employees, setEmployees] = useState([]);
     const [isWorking, setIsWorking] = useState(true);
+
+    const classes = useStyles();
+    const history = useHistory();
+    const confirm = useConfirm();
 
     const handleOnChange = () => {
         setIsWorking(!isWorking);
@@ -30,9 +46,36 @@ const ViewEmployees = () => {
         setEmployees(fetched.data.faculties);
     };
 
-    useEffect(async () => {
+    const onEditClick = () => {
+        const employee = employees.find((e) => {
+            return e.id === selectedEmployee[0];
+        });
+        history.push({ pathname: '/admin/edit-faculty', state: employee, replace: true });
+    };
+    const onDeleteClick = () => {
+        const employee = employees.find((e) => {
+            return e.id === selectedEmployee[0];
+        });
+        confirm({ description: `"${employee.FirstName + ' ' + employee.LastName}" will be permanently deleted.` }).then(() => {
+            axios
+                .post(
+                    configData.API_SERVER + 'admin/delete-faculty',
+                    { id: selectedEmployee[0] },
+                    {
+                        headers: { 'x-auth-token': account.token }
+                    }
+                )
+                .then((response) => {
+                    if (response.success) {
+                        fetchFaculties(isWorking);
+                    }
+                });
+        });
+    };
+
+    useEffect(() => {
         fetchFaculties(isWorking);
-    }, []);
+    }, [employees]);
 
     const columns = [
         { field: 'Username', headerName: 'Email', flex: 1 },
@@ -48,19 +91,41 @@ const ViewEmployees = () => {
                 title="View Faculties"
                 secondary={
                     <FormGroup>
-                        <FormControlLabel onChange={handleOnChange} control={<Switch defaultChecked />} label="Working" />
+                        <Stack direction="row" spacing={2} alignItems="center">
+                            {selectedEmployee.length > 0 && (
+                                <>
+                                    <Button variant="contained" onClick={onEditClick} size="medium">
+                                        Edit
+                                    </Button>
+                                    <Button color="error" variant="contained" onClick={onDeleteClick} size="medium">
+                                        Delete
+                                    </Button>
+                                </>
+                            )}
+                            <FormControlLabel onChange={handleOnChange} control={<Switch defaultChecked />} label="Working" />
+                        </Stack>
                     </FormGroup>
                 }
             >
                 <div style={{ height: 650, width: '100%', backgroundColor: 'white' }}>
                     <DataGrid
                         rows={employees}
+                        className={classes.root}
                         columns={columns}
+                        selectionModel={selectedEmployee}
                         textAlign="center"
-                        pageSize={5}
-                        rowsPerPageOptions={[5]}
-                        rowCount={100}
-                        checkboxSelection
+                        checkboxSelection={isWorking}
+                        hideFooterSelectedRowCount
+                        onSelectionModelChange={(selection) => {
+                            if (selection.length > 1) {
+                                const selectionSet = new Set(selectedEmployee);
+                                const result = selection.filter((s) => !selectionSet.has(s));
+
+                                setSelectedEmployee(result);
+                            } else {
+                                setSelectedEmployee(selection);
+                            }
+                        }}
                     />
                 </div>
             </MainCard>

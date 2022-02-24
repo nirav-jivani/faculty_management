@@ -1,8 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { Link, useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
-import configData from '../../../../config';
+import configData from '../../config';
 
 // material-ui
 import { makeStyles } from '@material-ui/styles';
@@ -27,9 +27,9 @@ import { Formik } from 'formik';
 import axios from 'axios';
 
 // project imports
-import useScriptRef from '../../../../hooks/useScriptRef';
-import AnimateButton from '../../../../ui-component/extended/AnimateButton';
-import { ACCOUNT_INITIALIZE } from './../../../../store/actions';
+import useScriptRef from '../../hooks/useScriptRef';
+import AnimateButton from '../../ui-component/extended/AnimateButton';
+import { ACCOUNT_INITIALIZE, LOGOUT } from './../../store/actions';
 
 // assets
 import Visibility from '@material-ui/icons/Visibility';
@@ -76,14 +76,17 @@ const useStyles = makeStyles((theme) => ({
 
 //============================|| API JWT - LOGIN ||============================//
 
-const RestLogin = (props, { ...others }) => {
+const ChangePassword = (props, { ...others }) => {
     const classes = useStyles();
+    const history = useHistory();
     const dispatcher = useDispatch();
-
     const scriptedRef = useScriptRef();
-    const [checked, setChecked] = React.useState(true);
+    const account = useSelector((state) => state.account);
 
     const [showPassword, setShowPassword] = React.useState(false);
+    const [showPassword1, setShowPassword1] = React.useState(false);
+    const [showPassword2, setShowPassword2] = React.useState(false);
+
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
     };
@@ -92,36 +95,58 @@ const RestLogin = (props, { ...others }) => {
         event.preventDefault();
     };
 
+    const handleClickShowPassword1 = () => {
+        setShowPassword1(!showPassword1);
+    };
+
+    const handleMouseDownPassword1 = (event) => {
+        event.preventDefault();
+    };
+
+    const handleClickShowPassword2 = () => {
+        setShowPassword2(!showPassword2);
+    };
+
+    const handleMouseDownPassword2 = (event) => {
+        event.preventDefault();
+    };
+
     return (
         <React.Fragment>
             <Formik
                 initialValues={{
-                    email: '',
-                    password: '',
-                    submit: null
+                    oldPassword: '',
+                    newPassword: '',
+                    confirmPassword: ''
                 }}
                 validationSchema={Yup.object().shape({
-                    email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                    password: Yup.string().max(255).required('Password is required')
+                    oldPassword: Yup.string().max(255).required('Old password is required'),
+                    newPassword: Yup.string().max(255).required('New password is required'),
+                    confirmPassword: Yup.string()
+                        .max(255)
+                        .oneOf([Yup.ref('newPassword')], "Confirm password doesn't match")
                 })}
                 onSubmit={(values, { setErrors, setStatus, setSubmitting }) => {
                     try {
                         axios
-                            .post( configData.API_SERVER + 'users/login', {
-                                password: values.password,
-                                email: values.email
-                            })
+                            .post(
+                                configData.API_SERVER + 'users/change-password',
+                                {
+                                    oldPassword: values.oldPassword,
+                                    newPassword: values.newPassword,
+                                    confirmPassword: values.confirmPassword
+                                },
+                                { headers: { 'x-auth-token': account.token } }
+                            )
                             .then(function (response) {
                                 if (response.data.success) {
-                                    console.log(response.data);
-                                    dispatcher({
-                                        type: ACCOUNT_INITIALIZE,
-                                        payload: { isLoggedIn: true, user: response.data.user, token: response.data.token }
-                                    });
+                                    window.alert('Passwod Updated Sucessfully..');
+                                    dispatcher({ type: LOGOUT });
                                     if (scriptedRef.current) {
                                         setStatus({ success: true });
                                         setSubmitting(false);
                                     }
+                                    history.push('/login');
                                 } else {
                                     setStatus({ success: false });
                                     setErrors({ submit: response.data.msg });
@@ -145,37 +170,13 @@ const RestLogin = (props, { ...others }) => {
             >
                 {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                     <form noValidate onSubmit={handleSubmit} {...others}>
-                        <FormControl fullWidth error={Boolean(touched.email && errors.email)} className={classes.loginInput}>
-                            <InputLabel htmlFor="outlined-adornment-email-login">Email</InputLabel>
+                        <FormControl fullWidth error={Boolean(touched.oldPassword && errors.oldPassword)} className={classes.loginInput}>
+                            <InputLabel htmlFor="old-password">Old Password</InputLabel>
                             <OutlinedInput
-                                id="outlined-adornment-email-login"
-                                type="email"
-                                value={values.email}
-                                name="email"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                label="Email Address"
-                                inputProps={{
-                                    classes: {
-                                        notchedOutline: classes.notchedOutline
-                                    }
-                                }}
-                            />
-                            {touched.email && errors.email && (
-                                <FormHelperText error id="standard-weight-helper-text-email-login">
-                                    {' '}
-                                    {errors.email}{' '}
-                                </FormHelperText>
-                            )}
-                        </FormControl>
-
-                        <FormControl fullWidth error={Boolean(touched.password && errors.password)} className={classes.loginInput}>
-                            <InputLabel htmlFor="outlined-adornment-password-login">Password</InputLabel>
-                            <OutlinedInput
-                                id="outlined-adornment-password-login"
+                                id="old-password"
                                 type={showPassword ? 'text' : 'password'}
-                                value={values.password}
-                                name="password"
+                                value={values.oldPassword}
+                                name="oldPassword"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 endAdornment={
@@ -190,42 +191,94 @@ const RestLogin = (props, { ...others }) => {
                                         </IconButton>
                                     </InputAdornment>
                                 }
-                                label="Password"
                                 inputProps={{
                                     classes: {
                                         notchedOutline: classes.notchedOutline
                                     }
                                 }}
                             />
-                            {touched.password && errors.password && (
-                                <FormHelperText error id="standard-weight-helper-text-password-login">
+                            {touched.oldPassword && errors.oldPassword && (
+                                <FormHelperText error id="old-password-error">
                                     {' '}
-                                    {errors.password}{' '}
+                                    {errors.oldPassword}{' '}
                                 </FormHelperText>
                             )}
                         </FormControl>
-                        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={checked}
-                                        onChange={(event) => setChecked(event.target.checked)}
-                                        name="checked"
-                                        color="primary"
-                                    />
+
+                        <FormControl fullWidth error={Boolean(touched.newPassword && errors.newPassword)} className={classes.loginInput}>
+                            <InputLabel htmlFor="new-password">New Password</InputLabel>
+                            <OutlinedInput
+                                id="new-password"
+                                type={showPassword1 ? 'text' : 'password'}
+                                value={values.newPassword}
+                                name="newPassword"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={handleClickShowPassword1}
+                                            onMouseDown={handleMouseDownPassword}
+                                            edge="end"
+                                        >
+                                            {showPassword1 ? <Visibility /> : <VisibilityOff />}
+                                        </IconButton>
+                                    </InputAdornment>
                                 }
-                                label="Remember me"
+                                inputProps={{
+                                    classes: {
+                                        notchedOutline: classes.notchedOutline
+                                    }
+                                }}
                             />
-                            <Typography
-                                variant="subtitle1"
-                                component={Link}
-                                to={props.login ? '/pages/forgot-password/forgot-password' + props.login : '#'}
-                                color="secondary"
-                                sx={{ textDecoration: 'none' }}
-                            >
-                                Forgot Password?
-                            </Typography>
-                        </Stack>
+                            {touched.newPassword && errors.newPassword && (
+                                <FormHelperText error id="new-password-error">
+                                    {' '}
+                                    {errors.newPassword}{' '}
+                                </FormHelperText>
+                            )}
+                        </FormControl>
+
+                        <FormControl
+                            fullWidth
+                            error={Boolean(touched.confirmPassword && errors.confirmPassword)}
+                            className={classes.loginInput}
+                        >
+                            <InputLabel htmlFor="confirm-password">Confirm Password</InputLabel>
+                            <OutlinedInput
+                                id="confirm-password"
+                                type={showPassword2 ? 'text' : 'password'}
+                                value={values.confirmPassword}
+                                name="confirmPassword"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={handleClickShowPassword2}
+                                            onMouseDown={handleMouseDownPassword}
+                                            edge="end"
+                                        >
+                                            {showPassword2 ? <Visibility /> : <VisibilityOff />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
+                                inputProps={{
+                                    classes: {
+                                        notchedOutline: classes.notchedOutline
+                                    }
+                                }}
+                            />
+                            {touched.confirmPassword && errors.confirmPassword && (
+                                <FormHelperText error id="confirm-password-error">
+                                    {' '}
+                                    {errors.confirmPassword}{' '}
+                                </FormHelperText>
+                            )}
+                        </FormControl>
+
                         {errors.submit && (
                             <Box
                                 sx={{
@@ -251,7 +304,7 @@ const RestLogin = (props, { ...others }) => {
                                     variant="contained"
                                     color="secondary"
                                 >
-                                    Sign IN
+                                    Change Password
                                 </Button>
                             </AnimateButton>
                         </Box>
@@ -262,4 +315,4 @@ const RestLogin = (props, { ...others }) => {
     );
 };
 
-export default RestLogin;
+export default ChangePassword;

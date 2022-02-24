@@ -3,7 +3,6 @@ import { dashboard } from './dashboard';
 import { Events } from './Events';
 import { Publications } from './Publications';
 import { Admin } from './Admin';
-import { Accounts } from './Accounts';
 
 //-----------------------|| MENU ITEMS ||-----------------------//
 
@@ -11,7 +10,7 @@ import { Accounts } from './Accounts';
 // const user = JSON.parse(account.user);
 // console.log(account);
 const menuItems = {
-    items: [dashboard, Admin, Events, Accounts]
+    items: [dashboard, Admin, Events, Publications]
 };
 
 export default menuItems;

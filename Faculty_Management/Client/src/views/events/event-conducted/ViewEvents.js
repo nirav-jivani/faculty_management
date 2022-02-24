@@ -39,7 +39,7 @@ const ViewEvents = () => {
 
     const getEvents = () => {
         axios
-            .get(configData.API_SERVER + 'events/get-events-attended', {
+            .get(configData.API_SERVER + 'events/get-events-conducted', {
                 headers: { 'x-auth-token': account.token }
             })
             .then((response) => {
@@ -53,7 +53,7 @@ const ViewEvents = () => {
 
     const onEditClick = () => {
         const event = events.find((e) => e.id === selectedEvent[0]);
-        history.push({ pathname: '/event-attended/update-event', state: event, replace: true });
+        history.push({ pathname: '/event-conducted/update-event', state: event, replace: true });
     };
 
     const onDeleteClick = async () => {
@@ -61,7 +61,7 @@ const ViewEvents = () => {
         confirm({ description: `Event "${event.EventTitle}" will be permanently deleted.` }).then(() => {
             axios
                 .post(
-                    configData.API_SERVER + 'events/delete-event-attended',
+                    configData.API_SERVER + 'events/delete-event-conducted',
                     { id: selectedEvent[0] },
                     {
                         headers: { 'x-auth-token': account.token }
@@ -76,7 +76,7 @@ const ViewEvents = () => {
     };
 
     const onViewClick = () => {
-        axios(configData.API_SERVER + `events/get-certificate-event-attended/${selectedEvent[0]}`, {
+        axios(configData.API_SERVER + `events/get-certificate-event-conducted/${selectedEvent[0]}`, {
             method: 'GET',
             responseType: 'blob',
             headers: { 'x-auth-token': account.token }
@@ -97,7 +97,7 @@ const ViewEvents = () => {
 
     return (
         <MainCard
-            title="View Events (Attended)"
+            title="View Events (Conducted)"
             secondary={
                 <Stack direction="row" spacing={2} alignItems="center">
                     {selectedEvent.length > 0 && (
@@ -136,12 +136,12 @@ const ViewEvents = () => {
                             if (result.length !== 0) {
                                 const event = events.find((e) => e.id === result[0]);
                                 console.log(event);
-                                event.CertificatePath !== null ? setIsFileAvailable(true) : setIsFileAvailable(false);
+                                event.ProofPath !== '' ? setIsFileAvailable(true) : setIsFileAvailable(false);
                             }
                         } else {
                             if (selection.length !== 0) {
                                 const event = events.find((e) => e.id === selection[0]);
-                                event.CertificatePath !== null ? setIsFileAvailable(true) : setIsFileAvailable(false);
+                                event.ProofPath !== '' ? setIsFileAvailable(true) : setIsFileAvailable(false);
                             }
                             setSelectedEvent(selection);
                         }

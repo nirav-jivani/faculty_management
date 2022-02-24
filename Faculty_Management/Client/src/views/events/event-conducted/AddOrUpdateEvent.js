@@ -85,23 +85,25 @@ const AddOrUpdateEvent = (props, { ...others }) => {
     const scriptedRef = useScriptRef();
     const [event, setPassData] = useState(location.state);
     const [file, setFile] = useState();
+    const [alertMessage, setAlertMessage] = useState('');
 
     const account = useSelector((state) => state.account);
+
     const onFileChange = (event) => {
         setFile(event.target.files[0]);
     };
 
     return (
-        <MainCard title={(event ? 'Update' : 'Add') + ' Event (Attended)'}>
+        <MainCard title={(event ? 'Update' : 'Add') + ' Event (Conducted)'}>
             <Formik
                 initialValues={{
                     title: event ? event.EventTitle : '',
                     organizedBy: event ? event.OrganizedBy : '',
-                    organizedAt: event ? event.OrganizedAt : '',
+                    conductedAt: event ? event.ConductedAt : '',
                     fromDate: event ? format(new Date(event.StartDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
                     toDate: event ? format(new Date(event.EndDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
                     duration: event ? event.Duration : '',
-                    speakerName: event ? event.SpeakerName : '',
+                    participants: event ? event.TotalParticipants : '',
                     topic: event ? event.EventTopic : '',
                     level: event ? event.EventLevel : 'Local',
                     type: event ? event.EventType : 'FDP',
@@ -113,11 +115,11 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                 validationSchema={Yup.object().shape({
                     title: Yup.string().required('Event Title is required'),
                     organizedBy: Yup.string().required('Organized By is required'),
-                    organizedAt: Yup.string().required('Organized At is required'),
+                    conductedAt: Yup.string().required('Conducted At is required'),
                     fromDate: Yup.date().required('From Date is required'),
                     toDate: Yup.date().min(Yup.ref('fromDate'), "To date can't be before From date"),
                     duration: Yup.string().required('Duration is required'),
-                    speakerName: Yup.string().required('Speaker Name is required'),
+                    participants: Yup.string().required('Speaker Name is required'),
                     topic: Yup.string().required('Topic Name is required'),
                     academicYear: Yup.string().required('Academic Year is required'),
                     approvedBy: Yup.string().required('Approved By is required')
@@ -132,11 +134,11 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                                 id: event ? event.id : '',
                                 title: values.title,
                                 organizedBy: values.organizedBy,
-                                organizedAt: values.organizedAt,
+                                conductedAt: values.conductedAt,
                                 fromDate: values.fromDate,
                                 toDate: values.toDate,
                                 duration: values.duration,
-                                speakerName: values.speakerName,
+                                participants: values.participants,
                                 topic: values.topic,
                                 level: values.level,
                                 type: values.type,
@@ -144,21 +146,22 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                                 mode: values.mode,
                                 academicYear: values.academicYear,
                                 approvedBy: values.approvedBy,
-                                CertificatePath: event ? event.CertificatePath : ''
+                                ProofPath: event ? event.ProofPath : ''
                             })
                         );
                         axios
-                            .post(configData.API_SERVER + 'events/add-or-update-event-attended', formData, {
+                            .post(configData.API_SERVER + 'events/add-or-update-event-conducted', formData, {
                                 headers: { 'x-auth-token': account.token }
                             })
                             .then(function (response) {
                                 if (response.data.success) {
+                                    console.log('success');
                                     props.setAlertMessage((event ? 'Updated' : 'Added') + ' Sucessfully');
                                     if (scriptedRef.current) {
                                         setStatus({ success: true });
                                         setSubmitting(false);
                                     }
-                                    history.push('/event-attended/view-events');
+                                    history.push('/event-conducted/view-events');
                                 } else {
                                     setStatus({ success: false });
                                     setErrors({ submit: response.data.msg });
@@ -216,16 +219,16 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                         <TextField
                             fullWidth
                             margin="normal"
-                            label="Organized At"
-                            error={Boolean(touched.organizedAt && errors.organizedAt)}
-                            name="organizedAt"
-                            value={values.organizedAt}
+                            label="Conducted At"
+                            error={Boolean(touched.conductedAt && errors.conductedAt)}
+                            name="conductedAt"
+                            value={values.conductedAt}
                             onChange={handleChange}
                         />
-                        {touched.organizedAt && errors.organizedAt && (
+                        {touched.conductedAt && errors.conductedAt && (
                             <FormHelperText error id="standard-weight-helper-text-email-title">
                                 {' '}
-                                {errors.organizedAt}{' '}
+                                {errors.conductedAt}{' '}
                             </FormHelperText>
                         )}
 
@@ -282,16 +285,16 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                         <TextField
                             fullWidth
                             margin="normal"
-                            label="Speaker Of The Event"
-                            error={Boolean(touched.speakerName && errors.speakerName)}
-                            name="speakerName"
-                            value={values.speakerName}
+                            label="Number Of Participants"
+                            error={Boolean(touched.participants && errors.participants)}
+                            name="participants"
+                            value={values.participants}
                             onChange={handleChange}
                         />
-                        {touched.speakerName && errors.speakerName && (
+                        {touched.participants && errors.participants && (
                             <FormHelperText error id="standard-weight-helper-text-email-title">
                                 {' '}
-                                {errors.speakerName}{' '}
+                                {errors.participants}{' '}
                             </FormHelperText>
                         )}
 
@@ -385,7 +388,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                         <TextField
                             fullWidth
                             margin="normal"
-                            label="Scanned Copy of Certificate"
+                            label="Scanned Copy of Document(If any)"
                             name="file"
                             InputLabelProps={{ shrink: true }}
                             onChange={onFileChange}

@@ -60,5 +60,32 @@ router.post("/update-account", authenticateUser, async (req, res) => {
     res.status(500).json(data);
   }
 });
+router.post("/change-password", authenticateUser, async (req, res) => {
+  const data = req.body;
+  try {
+    const temp = await db
+      .promise()
+      .query(`SELECT Password FROM faculties  WHERE id = ?`, [req.user.id]);
 
+    if (
+      (await bcrypt.compare(data.oldPassword, temp[0][0].Password)) &&
+      data.newPassword === data.confirmPassword
+    ) {
+      let salt = await bcrypt.genSalt(10);
+      const password = await bcrypt.hash(data.newPassword, salt);
+      const user = await db
+        .promise()
+        .query(`UPDATE  faculties SET Password = ? WHERE id=? `, [
+          password,
+          req.user.id,
+        ]);
+
+      res.json({ success: true });
+    }
+    res.json({ success: false, msg: "Password doesn't match.." });
+  } catch (err) {
+    const data = { success: false, msg: "internal server Error" };
+    res.status(500).json(data);
+  }
+});
 module.exports = router;

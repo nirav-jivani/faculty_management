@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Redirect } from 'react-router-dom';
+import { Redirect, useLocation } from 'react-router-dom';
 
 // project imports
 import config from '../../config';
@@ -14,9 +14,10 @@ import config from '../../config';
  */
 const GuestGuard = ({ children }) => {
     const account = useSelector((state) => state.account);
+    const location = useLocation();
     const { isLoggedIn } = account;
 
-    if (isLoggedIn) {
+    if (isLoggedIn && location.pathname === '/login') {
         return <Redirect to={config.defaultPath} />;
     }
 

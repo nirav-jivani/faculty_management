@@ -85,25 +85,25 @@ const AddOrUpdateEvent = (props, { ...others }) => {
     const scriptedRef = useScriptRef();
     const [event, setPassData] = useState(location.state);
     const [file, setFile] = useState();
+    const [alertMessage, setAlertMessage] = useState('');
 
     const account = useSelector((state) => state.account);
+
     const onFileChange = (event) => {
         setFile(event.target.files[0]);
     };
 
     return (
-        <MainCard title={(event ? 'Update' : 'Add') + ' Event (Attended)'}>
+        <MainCard title={(event ? 'Update' : 'Add') + ' Event (Organized)'}>
             <Formik
                 initialValues={{
                     title: event ? event.EventTitle : '',
-                    organizedBy: event ? event.OrganizedBy : '',
-                    organizedAt: event ? event.OrganizedAt : '',
+                    speakerName: event ? event.SpeakerName : '',
                     fromDate: event ? format(new Date(event.StartDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
                     toDate: event ? format(new Date(event.EndDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
                     duration: event ? event.Duration : '',
-                    speakerName: event ? event.SpeakerName : '',
+                    participants: event ? event.TotalParticipants : '',
                     topic: event ? event.EventTopic : '',
-                    level: event ? event.EventLevel : 'Local',
                     type: event ? event.EventType : 'FDP',
                     otherType: event ? event.OtherType : '',
                     mode: event ? event.EventMode : 'Online',
@@ -112,12 +112,11 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                 }}
                 validationSchema={Yup.object().shape({
                     title: Yup.string().required('Event Title is required'),
-                    organizedBy: Yup.string().required('Organized By is required'),
-                    organizedAt: Yup.string().required('Organized At is required'),
+                    speakerName: Yup.string().required('Speaker name is required'),
                     fromDate: Yup.date().required('From Date is required'),
                     toDate: Yup.date().min(Yup.ref('fromDate'), "To date can't be before From date"),
                     duration: Yup.string().required('Duration is required'),
-                    speakerName: Yup.string().required('Speaker Name is required'),
+                    participants: Yup.string().required('Speaker Name is required'),
                     topic: Yup.string().required('Topic Name is required'),
                     academicYear: Yup.string().required('Academic Year is required'),
                     approvedBy: Yup.string().required('Approved By is required')
@@ -131,34 +130,33 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             JSON.stringify({
                                 id: event ? event.id : '',
                                 title: values.title,
-                                organizedBy: values.organizedBy,
-                                organizedAt: values.organizedAt,
+                                speakerName: values.speakerName,
                                 fromDate: values.fromDate,
                                 toDate: values.toDate,
                                 duration: values.duration,
-                                speakerName: values.speakerName,
+                                participants: values.participants,
                                 topic: values.topic,
-                                level: values.level,
                                 type: values.type,
                                 otherType: values.otherType,
                                 mode: values.mode,
                                 academicYear: values.academicYear,
                                 approvedBy: values.approvedBy,
-                                CertificatePath: event ? event.CertificatePath : ''
+                                ProofPath: event ? event.ProofPath : ''
                             })
                         );
                         axios
-                            .post(configData.API_SERVER + 'events/add-or-update-event-attended', formData, {
+                            .post(configData.API_SERVER + 'events/add-or-update-event-organized', formData, {
                                 headers: { 'x-auth-token': account.token }
                             })
                             .then(function (response) {
                                 if (response.data.success) {
+                                    console.log('success');
                                     props.setAlertMessage((event ? 'Updated' : 'Added') + ' Sucessfully');
                                     if (scriptedRef.current) {
                                         setStatus({ success: true });
                                         setSubmitting(false);
                                     }
-                                    history.push('/event-attended/view-events');
+                                    history.push('/event-organized/view-events');
                                 } else {
                                     setStatus({ success: false });
                                     setErrors({ submit: response.data.msg });
@@ -200,35 +198,34 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                         <TextField
                             fullWidth
                             margin="normal"
-                            label="Organized By"
-                            error={Boolean(touched.organizedBy && errors.organizedBy)}
-                            name="organizedBy"
-                            value={values.organizedBy}
+                            label="Topic of The Event"
+                            error={Boolean(touched.topic && errors.topic)}
+                            name="topic"
+                            value={values.topic}
                             onChange={handleChange}
                         />
-                        {touched.organizedBy && errors.organizedBy && (
+                        {touched.topic && errors.topic && (
                             <FormHelperText error id="standard-weight-helper-text-email-title">
                                 {' '}
-                                {errors.organizedBy}{' '}
+                                {errors.topic}{' '}
                             </FormHelperText>
                         )}
-
                         <TextField
                             fullWidth
                             margin="normal"
-                            label="Organized At"
-                            error={Boolean(touched.organizedAt && errors.organizedAt)}
-                            name="organizedAt"
-                            value={values.organizedAt}
+                            label="Speaker name"
+                            error={Boolean(touched.speakerName && errors.speakerName)}
+                            name="speakerName"
+                            value={values.speakerName}
                             onChange={handleChange}
                         />
-                        {touched.organizedAt && errors.organizedAt && (
+
+                        {touched.speakerName && errors.speakerName && (
                             <FormHelperText error id="standard-weight-helper-text-email-title">
                                 {' '}
-                                {errors.organizedAt}{' '}
+                                {errors.speakerName}{' '}
                             </FormHelperText>
                         )}
-
                         <TextField
                             fullWidth
                             margin="normal"
@@ -245,7 +242,6 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                                 {errors.fromDate}{' '}
                             </FormHelperText>
                         )}
-
                         <TextField
                             fullWidth
                             margin="normal"
@@ -262,7 +258,6 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                                 {errors.toDate}{' '}
                             </FormHelperText>
                         )}
-
                         <TextField
                             fullWidth
                             margin="normal"
@@ -278,47 +273,21 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                                 {errors.duration}{' '}
                             </FormHelperText>
                         )}
-
                         <TextField
                             fullWidth
                             margin="normal"
-                            label="Speaker Of The Event"
-                            error={Boolean(touched.speakerName && errors.speakerName)}
-                            name="speakerName"
-                            value={values.speakerName}
+                            label="Number Of Participants"
+                            error={Boolean(touched.participants && errors.participants)}
+                            name="participants"
+                            value={values.participants}
                             onChange={handleChange}
                         />
-                        {touched.speakerName && errors.speakerName && (
+                        {touched.participants && errors.participants && (
                             <FormHelperText error id="standard-weight-helper-text-email-title">
                                 {' '}
-                                {errors.speakerName}{' '}
+                                {errors.participants}{' '}
                             </FormHelperText>
                         )}
-
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            label="Topic of The Event"
-                            error={Boolean(touched.topic && errors.topic)}
-                            name="topic"
-                            value={values.topic}
-                            onChange={handleChange}
-                        />
-                        {touched.topic && errors.topic && (
-                            <FormHelperText error id="standard-weight-helper-text-email-title">
-                                {' '}
-                                {errors.topic}{' '}
-                            </FormHelperText>
-                        )}
-
-                        <FormControl fullWidth margin="normal" component="fieldset">
-                            <FormLabel component="legend">Level of Event</FormLabel>
-                            <RadioGroup aria-label="type" name="level" value={values.level} onChange={handleChange}>
-                                <FormControlLabel value="Local" control={<Radio />} label="Local" />
-                                <FormControlLabel value="National" control={<Radio />} label="National" />
-                                <FormControlLabel value="International" control={<Radio />} label="International" />
-                            </RadioGroup>
-                        </FormControl>
 
                         <FormControl fullWidth margin="normal" component="fieldset">
                             <FormLabel component="legend">Type of Event</FormLabel>
@@ -331,7 +300,6 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                                 <FormControlLabel value="Any Other" control={<Radio />} label="Any Other" />
                             </RadioGroup>
                         </FormControl>
-
                         <TextField
                             fullWidth
                             margin="normal"
@@ -341,7 +309,6 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             value={values.otherType}
                             onChange={handleChange}
                         />
-
                         <FormControl fullWidth margin="normal" component="fieldset">
                             <FormLabel component="legend">Mode of Event</FormLabel>
                             <RadioGroup aria-label="type" name="mode" value={values.mode} onChange={handleChange}>
@@ -349,7 +316,6 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                                 <FormControlLabel value="Offline" control={<Radio />} label="Offline" />
                             </RadioGroup>
                         </FormControl>
-
                         <TextField
                             fullWidth
                             margin="normal"
@@ -365,7 +331,6 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                                 {errors.academicYear}{' '}
                             </FormHelperText>
                         )}
-
                         <TextField
                             fullWidth
                             margin="normal"
@@ -381,17 +346,15 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                                 {errors.approvedBy}{' '}
                             </FormHelperText>
                         )}
-
                         <TextField
                             fullWidth
                             margin="normal"
-                            label="Scanned Copy of Certificate"
+                            label="Scanned Copy of Document(If any)"
                             name="file"
                             InputLabelProps={{ shrink: true }}
                             onChange={onFileChange}
                             type="file"
                         />
-
                         {errors.submit && (
                             <Box
                                 sx={{
@@ -401,7 +364,6 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                                 <FormHelperText error>{errors.submit}</FormHelperText>
                             </Box>
                         )}
-
                         <Box
                             sx={{
                                 mt: 2

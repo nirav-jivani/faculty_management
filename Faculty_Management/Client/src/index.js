@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
+import { ConfirmProvider } from 'material-ui-confirm';
 
 // project imports
 import { store, persister } from './store';
@@ -21,7 +22,9 @@ ReactDOM.render(
     <Provider store={store}>
         <PersistGate loading={null} persistor={persister}>
             <BrowserRouter basename={config.basename}>
-                <App />
+                <ConfirmProvider>
+                    <App />
+                </ConfirmProvider>
             </BrowserRouter>
         </PersistGate>
     </Provider>,

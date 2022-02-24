@@ -67,13 +67,13 @@ const Header = ({ handleLeftDrawerToggle }) => {
             </Box>
             {/* smDown = this defines size for laptop and tablet*/}
             <Hidden smDown>
-                <Typography fontSize='2rem' fontWeight='bold'>
+                <Typography fontSize="2rem" fontWeight="bold">
                     Dharamsinh Desai University
                 </Typography>
             </Hidden>
             {/* smUp = this defines size for mobile */}
             <Hidden smUp>
-                <Typography fontSize='2rem' fontWeight='bold'>
+                <Typography fontSize="2rem" fontWeight="bold">
                     DDU
                 </Typography>
             </Hidden>

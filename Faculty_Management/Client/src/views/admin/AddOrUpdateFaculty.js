@@ -1,8 +1,7 @@
 import { React, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { format } from 'date-fns';
-import { useHistory } from 'react-router';
 // material-ui
 import { makeStyles } from '@material-ui/styles';
 
@@ -29,6 +28,7 @@ import { Formik } from 'formik';
 import axios from 'axios';
 
 // project imports
+import MyAlert from './../../ui-component/MyAlert';
 import MainCard from './../../ui-component/cards/MainCard';
 import configData from '../../config';
 import useScriptRef from '../../hooks/useScriptRef';
@@ -74,14 +74,17 @@ const useStyles = makeStyles((theme) => ({
 
 //============================|| API JWT - LOGIN ||============================//
 
-const AddFaculty = (props, { ...others }) => {
+const AddOrUpdateFaculty = (props, { ...others }) => {
     const classes = useStyles();
     const history = useHistory();
     const scriptedRef = useScriptRef();
+    const location = useLocation();
 
     const account = useSelector((state) => state.account);
     const [deptList, setDeptList] = useState([]);
     const [designationList, setDesignationList] = useState([]);
+    const [employee, setEmployee] = useState(location.state);
+
     useEffect(() => {
         axios
             .get(configData.API_SERVER + 'admin/get-dept-designations', { headers: { 'x-auth-token': account.token } })
@@ -89,21 +92,19 @@ const AddFaculty = (props, { ...others }) => {
                 if (response.data.success) {
                     setDeptList(response.data.deptList);
                     setDesignationList(response.data.designationList);
-                    //console.log(deptList);
                 }
             });
     }, []);
-
     return (
-        <MainCard title="Add Faculty">
+        <MainCard title={(employee ? 'Edit' : 'Add') + ' Faculty'}>
             <Formik
                 initialValues={{
-                    email: '',
-                    joinDate: format(new Date(), 'yyyy-MM-dd'),
-                    department: '',
-                    designation: '',
-                    firstName: '',
-                    lastName: ''
+                    email: employee ? employee.Username : '',
+                    joinDate: employee ? format(new Date(employee.JoinDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
+                    department: employee ? employee.DeptId : '',
+                    designation: employee ? employee.DesignationId : '',
+                    firstName: employee ? employee.FirstName : '',
+                    lastName: employee ? employee.LastName : ''
                 }}
                 validationSchema={Yup.object().shape({
                     email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
@@ -117,8 +118,10 @@ const AddFaculty = (props, { ...others }) => {
                             .post(
                                 configData.API_SERVER + 'admin/add-faculty',
                                 {
+                                    id: employee ? employee.id : '',
                                     joinDate: values.joinDate,
                                     email: values.email,
+                                    oldEmail: employee.Username,
                                     department: values.department,
                                     designation: values.designation,
                                     firstName: values.firstName,
@@ -128,8 +131,7 @@ const AddFaculty = (props, { ...others }) => {
                             )
                             .then(function (response) {
                                 if (response.data.success) {
-                                    console.log('success');
-                                    window.alert('Added Sucessfully');
+                                    props.setAlertMessage((employee ? 'Edit' : 'Add') + ' Sucessfully');
                                     if (scriptedRef.current) {
                                         setStatus({ success: true });
                                         setSubmitting(false);
@@ -225,7 +227,7 @@ const AddFaculty = (props, { ...others }) => {
                             InputLabelProps={{ shrink: true }}
                             error={Boolean(touched.department && errors.department)}
                             id="department"
-                            value={values.dept}
+                            value={values.department}
                             name="department"
                             label="Department"
                             fullWidth
@@ -256,7 +258,7 @@ const AddFaculty = (props, { ...others }) => {
                             InputLabelProps={{ shrink: true }}
                             error={Boolean(touched.designation && errors.designation)}
                             id="designation"
-                            value={values.dept}
+                            value={values.designation}
                             name="designation"
                             label="Designation"
                             fullWidth
@@ -327,7 +329,7 @@ const AddFaculty = (props, { ...others }) => {
                                 variant="contained"
                                 color="secondary"
                             >
-                                Register
+                                {employee ? 'Edit' : 'Add'}
                             </Button>
                         </Box>
                     </form>
@@ -337,4 +339,4 @@ const AddFaculty = (props, { ...others }) => {
     );
 };
 
-export default AddFaculty;
+export default AddOrUpdateFaculty;
