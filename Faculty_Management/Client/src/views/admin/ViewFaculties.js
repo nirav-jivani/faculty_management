@@ -21,11 +21,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ViewEmployees = () => {
-
     const [selectedEmployee, setSelectedEmployee] = useState([]);
     const [employees, setEmployees] = useState([]);
     const [isWorking, setIsWorking] = useState(true);
-    
+
     const account = useSelector((state) => state.account);
     const classes = useStyles();
     const history = useHistory();
@@ -52,6 +51,13 @@ const ViewEmployees = () => {
             return e.id === selectedEmployee[0];
         });
         history.push({ pathname: '/admin/edit-faculty', state: employee, replace: true });
+    };
+
+    const onRoleClick = () => {
+        const employee = employees.find((e) => {
+            return e.id === selectedEmployee[0];
+        });
+        history.push({ pathname: '/roles/view-or-edit-roles', state: employee, replace: true });
     };
 
     const onDeleteClick = () => {
@@ -96,6 +102,11 @@ const ViewEmployees = () => {
                         <Stack direction="row" spacing={2} alignItems="center">
                             {selectedEmployee.length > 0 && (
                                 <>
+                                    {account.user.Roles.includes('Admin') && (
+                                        <Button variant="contained" onClick={onRoleClick} size="medium">
+                                            Roles
+                                        </Button>
+                                    )}
                                     <Button variant="contained" onClick={onEditClick} size="medium">
                                         Edit
                                     </Button>

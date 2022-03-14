@@ -13,7 +13,7 @@ export const Admin = {
     id: 'manage-faculty',
     title: 'Manage Faculty Details',
     type: 'group',
-    userType: 'Admin',
+    userType: 'FacultyManagementAdmin',
     children: [
         {
             id: 'add-faculty',

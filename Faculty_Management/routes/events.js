@@ -358,8 +358,8 @@ router.post(
       if (!data.id) {
         await db.promise().query(
           `INSERT INTO event_organized (FactId, EventTitle, StartDate,
-               EndDate, Duration, TotalParticipants,SpeakerName, EventTopic, EventType,OtherType, EventMode, AcademicYear,
-               ApprovedBy,ProofPath ) VALUES (?,?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+               EndDate, Duration, TotalParticipants,SpeakerName, EventTopic, EventType,OtherType,EventLevel, EventMode, AcademicYear,
+               ApprovedBy,ProofPath ) VALUES (?,?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`,
           [
             req.user.id,
             data.title,
@@ -371,6 +371,7 @@ router.post(
             data.topic,
             data.type,
             data.otherType,
+            data.level,
             data.mode,
             data.academicYear,
             data.approvedBy,
@@ -386,7 +387,7 @@ router.post(
         data.ProofPath = fileName ? fileName : data.ProofPath;
         await db.promise().query(
           `UPDATE event_organized SET EventTitle= ?,  StartDate= ?,
-               EndDate= ?, Duration= ?, TotalParticipants= ?,SpeakerName=?, EventTopic= ?, EventType= ?,OtherType= ?, EventMode= ?, AcademicYear= ?,
+               EndDate= ?, Duration= ?, TotalParticipants= ?,SpeakerName=?, EventTopic= ?, EventType= ?,OtherType= ?, EventLevel= ?,EventMode= ?, AcademicYear= ?,
                ApprovedBy= ?,ProofPath= ? WHERE id = ? `,
           [
             data.title,
@@ -398,6 +399,7 @@ router.post(
             data.topic,
             data.type,
             data.otherType,
+            data.level,
             data.mode,
             data.academicYear,
             data.approvedBy,

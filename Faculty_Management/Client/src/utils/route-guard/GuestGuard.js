@@ -17,7 +17,7 @@ const GuestGuard = ({ children }) => {
     const location = useLocation();
     const { isLoggedIn } = account;
 
-    if (isLoggedIn && location.pathname === '/login') {
+    if (isLoggedIn && location.pathname !== '/change-password') {
         return <Redirect to={config.defaultPath} />;
     }
 

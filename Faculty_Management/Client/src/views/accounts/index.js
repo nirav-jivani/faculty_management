@@ -10,6 +10,8 @@ import AuthWrapper from './AuthWrapper';
 import AuthCardWrapper from './AuthCardWrapper';
 import Login from './Login';
 import ChangePassword from './ChangePassword';
+import ForgotPassword from './ForgotPassword';
+import ResetPassword from './ResetPassword';
 
 //================================|| LOGIN MAIN ||================================//
 
@@ -26,43 +28,37 @@ const Index = (props) => {
                         <Grid item sx={{ m: { xs: 1, sm: 3 }, mb: 0 }}>
                             <AuthCardWrapper>
                                 <Grid container spacing={2} alignItems="center" justifyContent="center">
-                                    {location.pathname !== '/login' ? (
-                                        <Typography color={theme.palette.secondary.main} gutterBottom variant={matchDownSM ? 'h3' : 'h2'}>
-                                            Change Password
-                                        </Typography>
-                                    ) : (
-                                        <Grid item xs={12}>
-                                            <Grid
-                                                container
-                                                direction={matchDownSM ? 'column-reverse' : 'row'}
-                                                alignItems="center"
-                                                justifyContent="center"
-                                            >
-                                                <Grid item>
-                                                    <Stack alignItems="center" justifyContent="center" spacing={1}>
-                                                        <Typography
-                                                            color={theme.palette.secondary.main}
-                                                            gutterBottom
-                                                            variant={matchDownSM ? 'h3' : 'h2'}
-                                                        >
-                                                            Hi, Welcome Back
-                                                        </Typography>
-                                                        <Typography
-                                                            variant="caption"
-                                                            fontSize="16px"
-                                                            textAlign={matchDownSM ? 'center' : ''}
-                                                        >
-                                                            Enter your credentials to continue
-                                                        </Typography>
-                                                    </Stack>
-                                                </Grid>
+                                    <Grid item xs={12}>
+                                        <Grid
+                                            container
+                                            direction={matchDownSM ? 'column-reverse' : 'row'}
+                                            alignItems="center"
+                                            justifyContent="center"
+                                        >
+                                            <Grid item>
+                                                <Stack alignItems="center" justifyContent="center" spacing={1}>
+                                                    <Typography
+                                                        color={theme.palette.secondary.main}
+                                                        gutterBottom
+                                                        variant={matchDownSM ? 'h3' : 'h2'}
+                                                    >
+                                                        {props.title}
+                                                    </Typography>
+                                                    <Typography variant="caption" fontSize="16px" textAlign={matchDownSM ? 'center' : ''}>
+                                                        Enter your credentials to continue
+                                                    </Typography>
+                                                </Stack>
                                             </Grid>
                                         </Grid>
-                                    )}
-                                    <Grid item xs={12}>
-                                        {location.pathname === '/login' ? <Login /> : <ChangePassword setAlertMessage = {props.setAlertMessage}/>}
                                     </Grid>
-                                    {location.pathname === '/login' && (
+
+                                    <Grid item xs={12}>
+                                        {props.page === 'login' && <Login />}
+                                        {props.page === 'change-password' && <ChangePassword setAlertMessage={props.setAlertMessage} />}
+                                        {props.page === 'forgot-password' && <ForgotPassword setAlertMessage={props.setAlertMessage} />}
+                                        {props.page === 'reset-password' && <ResetPassword setAlertMessage={props.setAlertMessage} />}
+                                    </Grid>
+                                    {props.page === 'login' && (
                                         <>
                                             <Grid item xs={12}>
                                                 <Divider />
@@ -72,7 +68,7 @@ const Index = (props) => {
                                                     <Typography
                                                         variant="subtitle1"
                                                         component={Link}
-                                                        to={'#'}
+                                                        to={'/forgot-password'}
                                                         color="secondary"
                                                         sx={{ textDecoration: 'none' }}
                                                     >

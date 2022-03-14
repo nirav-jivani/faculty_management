@@ -11,10 +11,10 @@ const icons = {
 //-----------------------|| DASHBOARD MENU ITEMS ||-----------------------//
 
 export const Events = {
-    id: 'profile',
-    title: 'Profile',
+    id: 'events',
+    title: 'Events',
     type: 'group',
-    userType: 'Normal',
+    userType: 'Faculty',
     children: [
         {
             id: 'event-attended',

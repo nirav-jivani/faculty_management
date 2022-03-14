@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 // material-ui
@@ -60,20 +60,15 @@ const useStyles = makeStyles((theme) => ({
 
 //============================|| API JWT - LOGIN ||============================//
 
-const ChangePassword = (props, { ...others }) => {
+const ResetPassword = (props, { ...others }) => {
     const classes = useStyles();
     const history = useHistory();
     const dispatcher = useDispatch();
     const scriptedRef = useScriptRef();
-    const account = useSelector((state) => state.account);
+    const { token, id } = useParams();
 
-    const [showOldPassword, setShowOldPassword] = React.useState(false);
     const [showNewPassword, setShowNewPassword] = React.useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-
-    const handleClickShowOldPassword = () => {
-        setShowOldPassword(!showOldPassword);
-    };
 
     const handleClickShowNewPassword = () => {
         setShowNewPassword(!showNewPassword);
@@ -87,12 +82,10 @@ const ChangePassword = (props, { ...others }) => {
         <React.Fragment>
             <Formik
                 initialValues={{
-                    oldPassword: '',
                     newPassword: '',
                     confirmPassword: ''
                 }}
                 validationSchema={Yup.object().shape({
-                    oldPassword: Yup.string().max(255).required('Old password is required'),
                     newPassword: Yup.string().max(255).required('New password is required'),
                     confirmPassword: Yup.string()
                         .max(255)
@@ -101,15 +94,11 @@ const ChangePassword = (props, { ...others }) => {
                 onSubmit={(values, { setErrors, setStatus, setSubmitting }) => {
                     try {
                         axios
-                            .post(
-                                configData.API_SERVER + 'users/change-password',
-                                {
-                                    oldPassword: values.oldPassword,
-                                    newPassword: values.newPassword,
-                                    confirmPassword: values.confirmPassword
-                                },
-                                { headers: { 'x-auth-token': account.token } }
-                            )
+                            .post(configData.API_SERVER + 'users/reset-password', {
+                                id: id,
+                                token: token,
+                                newPassword: values.newPassword
+                            })
                             .then(function (response) {
                                 if (response.data.success) {
                                     props.setAlertMessage('Passwod Updated Sucessfully');
@@ -142,36 +131,6 @@ const ChangePassword = (props, { ...others }) => {
             >
                 {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                     <form noValidate onSubmit={handleSubmit} {...others}>
-                        <FormControl fullWidth error={Boolean(touched.oldPassword && errors.oldPassword)} className={classes.loginInput}>
-                            <InputLabel htmlFor="old-password">Old Password</InputLabel>
-                            <OutlinedInput
-                                id="old-password"
-                                type={showOldPassword ? 'text' : 'password'}
-                                value={values.oldPassword}
-                                name="oldPassword"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                endAdornment={
-                                    <InputAdornment position="end">
-                                        <IconButton aria-label="toggle password visibility" onClick={handleClickShowOldPassword} edge="end">
-                                            {showOldPassword ? <Visibility /> : <VisibilityOff />}
-                                        </IconButton>
-                                    </InputAdornment>
-                                }
-                                inputProps={{
-                                    classes: {
-                                        notchedOutline: classes.notchedOutline
-                                    }
-                                }}
-                            />
-                            {touched.oldPassword && errors.oldPassword && (
-                                <FormHelperText error id="old-password-error">
-                                    {' '}
-                                    {errors.oldPassword}{' '}
-                                </FormHelperText>
-                            )}
-                        </FormControl>
-
                         <FormControl fullWidth error={Boolean(touched.newPassword && errors.newPassword)} className={classes.loginInput}>
                             <InputLabel htmlFor="new-password">New Password</InputLabel>
                             <OutlinedInput
@@ -265,7 +224,7 @@ const ChangePassword = (props, { ...others }) => {
                                     variant="contained"
                                     color="secondary"
                                 >
-                                    CHANGE
+                                    RESET
                                 </Button>
                             </AnimateButton>
                         </Box>
@@ -276,4 +235,4 @@ const ChangePassword = (props, { ...others }) => {
     );
 };
 
-export default ChangePassword;
+export default ResetPassword;

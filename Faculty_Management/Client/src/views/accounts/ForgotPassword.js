@@ -1,5 +1,6 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 // material-ui
 import { makeStyles } from '@material-ui/styles';
@@ -16,7 +17,7 @@ import axios from 'axios';
 import configData from '../../config';
 import useScriptRef from '../../hooks/useScriptRef';
 import AnimateButton from '../../ui-component/extended/AnimateButton';
-import { ACCOUNT_INITIALIZE } from './../../store/actions';
+import { LOGOUT } from './../../store/actions';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -59,46 +60,34 @@ const useStyles = makeStyles((theme) => ({
 
 //============================|| API JWT - LOGIN ||============================//
 
-const Login = ({ ...others }) => {
+const ForgotPassword = (props, { ...others }) => {
     const classes = useStyles();
+    const history = useHistory();
     const dispatcher = useDispatch();
     const scriptedRef = useScriptRef();
-
-    const [showPassword, setShowPassword] = React.useState(false);
-    const handleClickShowPassword = () => {
-        setShowPassword(!showPassword);
-    };
 
     return (
         <React.Fragment>
             <Formik
                 initialValues={{
-                    email: '',
-                    password: '',
-                    submit: null
+                    email: ''
                 }}
                 validationSchema={Yup.object().shape({
-                    email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                    password: Yup.string().max(255).required('Password is required')
+                    email: Yup.string().max(255).required('Email is required')
                 })}
                 onSubmit={(values, { setErrors, setStatus, setSubmitting }) => {
                     try {
                         axios
-                            .post(configData.API_SERVER + 'users/login', {
-                                password: values.password,
-                                email: values.email
-                            })
+                            .post(configData.API_SERVER + 'users/forgot-password', { email: values.email })
                             .then(function (response) {
                                 if (response.data.success) {
-                                    console.log(response.data);
-                                    dispatcher({
-                                        type: ACCOUNT_INITIALIZE,
-                                        payload: { isLoggedIn: true, user: response.data.user, token: response.data.token }
-                                    });
+                                    props.setAlertMessage('Reset password link sent Sucessfully');
+                                    dispatcher({ type: LOGOUT });
                                     if (scriptedRef.current) {
                                         setStatus({ success: true });
                                         setSubmitting(false);
                                     }
+                                    history.push('/login');
                                 } else {
                                     setStatus({ success: false });
                                     setErrors({ submit: response.data.msg });
@@ -145,36 +134,6 @@ const Login = ({ ...others }) => {
                             )}
                         </FormControl>
 
-                        <FormControl fullWidth error={Boolean(touched.password && errors.password)} className={classes.loginInput}>
-                            <InputLabel htmlFor="password">Password</InputLabel>
-                            <OutlinedInput
-                                id="password"
-                                type={showPassword ? 'text' : 'password'}
-                                value={values.password}
-                                name="password"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                endAdornment={
-                                    <InputAdornment position="end">
-                                        <IconButton aria-label="toggle password visibility" onClick={handleClickShowPassword} edge="end">
-                                            {showPassword ? <Visibility /> : <VisibilityOff />}
-                                        </IconButton>
-                                    </InputAdornment>
-                                }
-                                inputProps={{
-                                    classes: {
-                                        notchedOutline: classes.notchedOutline
-                                    }
-                                }}
-                            />
-                            {touched.password && errors.password && (
-                                <FormHelperText error id="password-error">
-                                    {' '}
-                                    {errors.password}{' '}
-                                </FormHelperText>
-                            )}
-                        </FormControl>
-
                         {errors.submit && (
                             <Box
                                 sx={{
@@ -200,7 +159,7 @@ const Login = ({ ...others }) => {
                                     variant="contained"
                                     color="secondary"
                                 >
-                                    Sign IN
+                                    SUBMIT
                                 </Button>
                             </AnimateButton>
                         </Box>
@@ -211,4 +170,4 @@ const Login = ({ ...others }) => {
     );
 };
 
-export default Login;
+export default ForgotPassword;

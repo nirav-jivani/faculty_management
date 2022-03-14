@@ -407,7 +407,7 @@ const MyAccount = (props, { ...others }) => {
                                 mt: 2
                             }}
                         >
-                            <Button disableElevation size="large" type="submit" variant="contained" color="secondary">
+                            <Button disableElevation size="large" type="submit" variant="contained" color="primary">
                                 {isDisabled ? 'Edit' : 'Save'}
                             </Button>
                         </Box>

@@ -1,26 +1,33 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { format } from 'date-fns';
 
 // material-ui
 import { makeStyles } from '@material-ui/styles';
+import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
 
 import {
     Box,
+    Fab,
     TextField,
     Button,
     FormControl,
+    Stack,
     FormControlLabel,
     FormHelperText,
     Radio,
+    InputAdornment,
     FormLabel,
+    Tooltip,
+    MenuItem,
     RadioGroup
 } from '@material-ui/core';
 
 // third party
 import * as Yup from 'yup';
-import { Formik } from 'formik';
+import { FieldArray, Form, Formik, getIn } from 'formik';
 import axios from 'axios';
 
 // project imports
@@ -74,82 +81,146 @@ const AddResearchPaper = (props, { ...others }) => {
     const location = useLocation();
     const history = useHistory();
     const scriptedRef = useScriptRef();
-    const [event, setevent] = useState(location.state);
-    const [file, setFile] = useState();
-
+    const [researchPaper, setResearchPaper] = useState(location.state);
+    const [academicYears, setAcademicYears] = useState([]);
     const account = useSelector((state) => state.account);
-    const onFileChange = (event) => {
-        setFile(event.target.files[0]);
+
+    const calculateYear = () => {
+        let start = 2000;
+        const end = new Date().getFullYear();
+        let years = [];
+        while (start !== end + 1) {
+            years.push(`${start}-${start + 1}`);
+            start++;
+        }
+        setAcademicYears(years);
     };
 
+    useEffect(() => {
+        calculateYear();
+    }, []);
+
     return (
-        <MainCard title={(event ? 'Update' : 'Add') + ' Publication'}>
+        <MainCard title={(researchPaper ? 'Update' : 'Add') + ' Research Paper'}>
             <Formik
                 initialValues={{
-                    title: event ? event.EventTitle : '',
-                    organizedBy: event ? event.OrganizedBy : '',
-                    organizedAt: event ? event.OrganizedAt : '',
-                    fromDate: event ? format(new Date(event.StartDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
-                    toDate: event ? format(new Date(event.EndDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
-                    duration: event ? event.Duration : '',
-                    speakerName: event ? event.SpeakerName : '',
-                    topic: event ? event.EventTopic : '',
-                    level: event ? event.EventLevel : 'Local',
-                    type: event ? event.EventType : 'FDP',
-                    otherType: event ? event.OtherType : '',
-                    mode: event ? event.EventMode : 'Online',
-                    academicYear: event ? event.AcademicYear : '',
-                    approvedBy: event ? event.ApprovedBy : ''
+                    authors: researchPaper ? researchPaper.authors : [{ Name: '', Department: '', Organization: '' }],
+                    type: researchPaper ? researchPaper.type : 'Conference',
+                    academicYear: researchPaper
+                        ? researchPaper.AcademicYear
+                        : `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`,
+                    researchTitle: researchPaper ? researchPaper.ResearchTitle : '',
+                    title: researchPaper
+                        ? researchPaper.type === 'Conference'
+                            ? researchPaper.ConferenceTitle
+                            : researchPaper.JournalTitle
+                        : '',
+                    level: researchPaper ? researchPaper.Level : 'National',
+                    fromDate:
+                        researchPaper && researchPaper.type === 'Conference'
+                            ? format(new Date(researchPaper.StartDate), 'yyyy-MM-dd')
+                            : format(new Date(), 'yyyy-MM-dd'),
+                    toDate:
+                        researchPaper && researchPaper.type === 'Conference'
+                            ? format(new Date(researchPaper.EndDate), 'yyyy-MM-dd')
+                            : format(new Date(), 'yyyy-MM-dd'),
+                    conferenceName: researchPaper && researchPaper.type === 'Conference' ? researchPaper.ConferenceName : '',
+                    organizer: researchPaper && researchPaper.type === 'Conference' ? researchPaper.Organizer : '',
+                    city: researchPaper && researchPaper.type === 'Conference' ? researchPaper.City : '',
+                    state: researchPaper && researchPaper.type === 'Conference' ? researchPaper.State : '',
+                    country: researchPaper && researchPaper.type === 'Conference' ? researchPaper.Country : '',
+                    publisher: researchPaper ? researchPaper.Publisher : '',
+                    publicationDate: researchPaper ? researchPaper.PublicationDate : format(new Date(), 'yyyy-MM-dd'),
+                    link: researchPaper && researchPaper.type !== 'Conference' ? researchPaper.Link : '',
+                    volumeNo: researchPaper && researchPaper.type !== 'Conference' ? researchPaper.VolumeNo : '',
+                    publicationNo: researchPaper && researchPaper.type !== 'Conference' ? researchPaper.PublicationNo : '',
+                    pages: researchPaper ? researchPaper.Pages : '',
+                    doi: researchPaper ? researchPaper.DOI : '',
+                    isbn: researchPaper ? researchPaper.ISBN : '',
+                    institute: researchPaper && researchPaper.type === 'Conference' ? researchPaper.AffiliatingInstitute : '',
+                    impactFactor: researchPaper && researchPaper.type !== 'Conference' ? researchPaper.ImpactFactor : '',
+                    impactYear: researchPaper && researchPaper.type !== 'Conference' ? researchPaper.ImpactFactorYear : '',
+                    impactAgency: researchPaper && researchPaper.type !== 'Conference' ? researchPaper.ImpactFactorAgency : '',
+                    hIndex: researchPaper && researchPaper.type !== 'Conference' ? researchPaper.HIndex : ''
                 }}
                 validationSchema={Yup.object().shape({
-                    title: Yup.string().required('Event Title is required'),
-                    organizedBy: Yup.string().required('Organized By is required'),
-                    organizedAt: Yup.string().required('Organized At is required'),
+                    authors: Yup.array().of(
+                        Yup.object().shape({
+                            Name: Yup.string().required(' '),
+                            Department: Yup.string().required(' '),
+                            Organization: Yup.string().required(' ')
+                        })
+                    ),
+                    researchTitle: Yup.string().required('Title of research paper is required'),
+                    title: Yup.string().required(`Title is required`),
                     fromDate: Yup.date().required('From Date is required'),
                     toDate: Yup.date().min(Yup.ref('fromDate'), "To date can't be before From date"),
-                    duration: Yup.string().required('Duration is required'),
-                    speakerName: Yup.string().required('Speaker Name is required'),
-                    topic: Yup.string().required('Topic Name is required'),
-                    academicYear: Yup.string().required('Academic Year is required'),
-                    approvedBy: Yup.string().required('Approved By is required')
+                    publisher: Yup.string().required('Publisher is required')
                 })}
                 onSubmit={(values, { setErrors, setStatus, setSubmitting }) => {
                     try {
-                        const formData = new FormData();
-                        formData.append('myfile', file);
-                        formData.append(
-                            'data',
-                            JSON.stringify({
-                                id: event ? event.id : '',
+                        let data;
+                        if (values.type === 'Conference') {
+                            data = {
+                                id: researchPaper ? researchPaper.id : '',
+                                type: values.type,
+                                authors: values.authors,
+                                researchTitle: values.researchTitle,
+                                level: values.level,
                                 title: values.title,
-                                organizedBy: values.organizedBy,
-                                organizedAt: values.organizedAt,
                                 fromDate: values.fromDate,
                                 toDate: values.toDate,
-                                duration: values.duration,
-                                speakerName: values.speakerName,
-                                topic: values.topic,
-                                level: values.level,
+                                conferenceName: values.conferenceName,
+                                organizer: values.organizer,
+                                city: values.city,
+                                state: values.state,
+                                country: values.country,
+                                publisher: values.publisher,
+                                publicationDate: values.publicationDate,
+                                pages: values.pages,
+                                doi: values.doi,
+                                isbn: values.isbn,
+                                institute: values.institute,
+                                academicYear: values.academicYear
+                            };
+                        } else {
+                            data = {
+                                id: researchPaper ? researchPaper.id : '',
                                 type: values.type,
-                                otherType: values.otherType,
-                                mode: values.mode,
-                                academicYear: values.academicYear,
-                                approvedBy: values.approvedBy,
-                                CertificatePath: event ? event.CertificatePath : ''
-                            })
-                        );
+                                authors: values.authors,
+                                researchTitle: values.researchTitle,
+                                level: values.level,
+                                title: values.title,
+                                publisher: values.publisher,
+                                link: values.link,
+                                publicationDate: values.publicationDate,
+                                volumeNo: values.volumeNo,
+                                publicationNo: values.publicationNo,
+                                pages: values.pages,
+                                doi: values.doi,
+                                isbn: values.isbn,
+                                impactFactor: values.impactFactor,
+                                impactYear: values.impactYear,
+                                impactAgency: values.impactAgency,
+                                hIndex: values.hIndex,
+                                academicYear: values.academicYear
+                            };
+                        }
                         axios
-                            .post(configData.API_SERVER + 'events/add-or-update-event-attended', formData, {
+                            .post(configData.API_SERVER + 'publications/add-or-update-research-paper', data, {
                                 headers: { 'x-auth-token': account.token }
                             })
                             .then(function (response) {
+                                console.log(response);
                                 if (response.data.success) {
-                                    props.setAlertMessage((event ? 'Updated' : 'Added') + ' Sucessfully');
+                                    props.setAlertMessage((researchPaper ? 'Updated' : 'Added') + ' Sucessfully');
                                     if (scriptedRef.current) {
                                         setStatus({ success: true });
                                         setSubmitting(false);
                                     }
-                                    history.push('/event-attended/view-events');
+                                    values.type === 'Conference'
+                                        ? history.push('/publications/view-conferences')
+                                        : history.push('/publications/view-journals');
                                 } else {
                                     setStatus({ success: false });
                                     setErrors({ submit: response.data.msg });
@@ -173,10 +244,43 @@ const AddResearchPaper = (props, { ...others }) => {
             >
                 {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                     <form noValidate encType="multipart/form-data" onSubmit={handleSubmit} {...others}>
+                        <FormControl fullWidth margin="normal" component="fieldset">
+                            <FormLabel component="legend">Type of Research Paper</FormLabel>
+                            <RadioGroup aria-label="type" name="type" value={values.type} onChange={handleChange}>
+                                <Stack direction="row" spacing={3}>
+                                    <FormControlLabel
+                                        value="Conference"
+                                        control={<Radio disabled={Boolean(researchPaper)} />}
+                                        label="Conference"
+                                    />
+                                    <FormControlLabel
+                                        value="Journal"
+                                        control={<Radio disabled={Boolean(researchPaper)} />}
+                                        label="Journal"
+                                    />
+                                </Stack>
+                            </RadioGroup>
+                        </FormControl>
+
                         <TextField
                             fullWidth
                             margin="normal"
-                            label="Title of the programme"
+                            label="Title of the Research Paper"
+                            error={Boolean(touched.researchTitle && errors.researchTitle)}
+                            name="researchTitle"
+                            value={values.researchTitle}
+                            onChange={handleChange}
+                        />
+                        {touched.researchTitle && errors.researchTitle && (
+                            <FormHelperText error id="research-title-error">
+                                {' '}
+                                {errors.researchTitle}{' '}
+                            </FormHelperText>
+                        )}
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label={`Title of the ${values.type}`}
                             error={Boolean(touched.title && errors.title)}
                             name="title"
                             value={values.title}
@@ -188,201 +292,319 @@ const AddResearchPaper = (props, { ...others }) => {
                                 {errors.title}{' '}
                             </FormHelperText>
                         )}
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            label="Organized By"
-                            error={Boolean(touched.organizedBy && errors.organizedBy)}
-                            name="organizedBy"
-                            value={values.organizedBy}
-                            onChange={handleChange}
-                        />
-                        {touched.organizedBy && errors.organizedBy && (
-                            <FormHelperText error id="organized-by-error">
-                                {' '}
-                                {errors.organizedBy}{' '}
-                            </FormHelperText>
-                        )}
+                        <FieldArray name="authors">
+                            {({ push, remove }) => (
+                                <div>
+                                    {values.authors.map((e, index) => (
+                                        <div key={index}>
+                                            <Box my={1}>
+                                                <FormLabel style={{ color: 'black' }} component="legend">
+                                                    Author-{index + 1}
+                                                </FormLabel>
+                                            </Box>
+                                            <Stack direction="row" justifyContent="center" spacing={2} alignItems="center">
+                                                <TextField
+                                                    fullWidth
+                                                    label="Name"
+                                                    error={Boolean(
+                                                        getIn(touched, `authors[${index}].Name`) && getIn(errors, `authors[${index}].Name`)
+                                                    )}
+                                                    name={`authors[${index}].Name`}
+                                                    value={e.Name}
+                                                    onChange={handleChange}
+                                                />
+
+                                                <TextField
+                                                    fullWidth
+                                                    margin="normal"
+                                                    label="Department"
+                                                    name={`authors[${index}].Department`}
+                                                    error={Boolean(
+                                                        getIn(touched, `authors[${index}].Department`) &&
+                                                            getIn(errors, `authors[${index}].Department`)
+                                                    )}
+                                                    value={e.Department}
+                                                    onChange={handleChange}
+                                                />
+                                                <TextField
+                                                    fullWidth
+                                                    label="Organization"
+                                                    name={`authors[${index}].Organization`}
+                                                    error={Boolean(
+                                                        getIn(touched, `authors[${index}].Organization`) &&
+                                                            getIn(errors, `authors[${index}].Organization`)
+                                                    )}
+                                                    value={e.Organization}
+                                                    onChange={handleChange}
+                                                />
+                                            </Stack>
+                                            <Stack direction="row" justifyContent="center" alignItems="center">
+                                                {index + 1 === values.authors.length && (
+                                                    <Box my={4}>
+                                                        <InputAdornment position="start">
+                                                            <Tooltip title="Add Author">
+                                                                <Fab
+                                                                    color="primary"
+                                                                    size="small"
+                                                                    onClick={() => push({ Name: '', Department: '', Organization: '' })}
+                                                                >
+                                                                    <AddIcon />
+                                                                </Fab>
+                                                            </Tooltip>
+                                                        </InputAdornment>
+                                                    </Box>
+                                                )}
+
+                                                {index + 1 === values.authors.length && values.authors.length > 1 && (
+                                                    <Box>
+                                                        <InputAdornment position="start">
+                                                            <Tooltip title="Remove Author">
+                                                                <Fab color="primary" size="small" onClick={() => remove(index)}>
+                                                                    <RemoveIcon />
+                                                                </Fab>
+                                                            </Tooltip>
+                                                        </InputAdornment>
+                                                    </Box>
+                                                )}
+                                            </Stack>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </FieldArray>
 
                         <TextField
-                            fullWidth
-                            margin="normal"
-                            label="Organized At"
-                            error={Boolean(touched.organizedAt && errors.organizedAt)}
-                            name="organizedAt"
-                            value={values.organizedAt}
-                            onChange={handleChange}
-                        />
-                        {touched.organizedAt && errors.organizedAt && (
-                            <FormHelperText error id="organized-at-error">
-                                {' '}
-                                {errors.organizedAt}{' '}
-                            </FormHelperText>
-                        )}
-
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            type="date"
-                            label="From Date"
-                            error={Boolean(touched.fromDate && errors.fromDate)}
-                            name="fromDate"
-                            value={values.fromDate}
-                            onChange={handleChange}
-                        />
-                        {touched.fromDate && errors.fromDate && (
-                            <FormHelperText error id="from-date-error">
-                                {' '}
-                                {errors.fromDate}{' '}
-                            </FormHelperText>
-                        )}
-
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            type="date"
-                            label="To Date"
-                            error={Boolean(touched.toDate && errors.toDate)}
-                            name="toDate"
-                            value={values.toDate}
-                            onChange={handleChange}
-                        />
-                        {touched.toDate && errors.toDate && (
-                            <FormHelperText error id="to-date-error">
-                                {' '}
-                                {errors.toDate}{' '}
-                            </FormHelperText>
-                        )}
-
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            label="Duration(in days)"
-                            error={Boolean(touched.duration && errors.duration)}
-                            name="duration"
-                            value={values.duration}
-                            onChange={handleChange}
-                        />
-                        {touched.duration && errors.duration && (
-                            <FormHelperText error id="duration-error">
-                                {' '}
-                                {errors.duration}{' '}
-                            </FormHelperText>
-                        )}
-
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            label="Speaker Of The Event"
-                            error={Boolean(touched.speakerName && errors.speakerName)}
-                            name="speakerName"
-                            value={values.speakerName}
-                            onChange={handleChange}
-                        />
-                        {touched.speakerName && errors.speakerName && (
-                            <FormHelperText error id="speaker-name-error">
-                                {' '}
-                                {errors.speakerName}{' '}
-                            </FormHelperText>
-                        )}
-
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            label="Topic of The Event"
-                            error={Boolean(touched.topic && errors.topic)}
-                            name="topic"
-                            value={values.topic}
-                            onChange={handleChange}
-                        />
-                        {touched.topic && errors.topic && (
-                            <FormHelperText error id="topic-error">
-                                {' '}
-                                {errors.topic}{' '}
-                            </FormHelperText>
-                        )}
-
-                        <FormControl fullWidth margin="normal" component="fieldset">
-                            <FormLabel component="legend">Level of Event</FormLabel>
-                            <RadioGroup aria-label="type" name="level" value={values.level} onChange={handleChange}>
-                                <FormControlLabel value="Local" control={<Radio />} label="Local" />
-                                <FormControlLabel value="National" control={<Radio />} label="National" />
-                                <FormControlLabel value="International" control={<Radio />} label="International" />
-                            </RadioGroup>
-                        </FormControl>
-
-                        <FormControl fullWidth margin="normal" component="fieldset">
-                            <FormLabel component="legend">Type of Event</FormLabel>
-                            <RadioGroup aria-label="type" name="type" value={values.type} onChange={handleChange}>
-                                <FormControlLabel value="FDP" control={<Radio />} label="FDP" />
-                                <FormControlLabel value="Workshop" control={<Radio />} label="Workshop" />
-                                <FormControlLabel value="Seminar" control={<Radio />} label="Seminar" />
-                                <FormControlLabel value="STTP" control={<Radio />} label="STTP" />
-                                <FormControlLabel value="Webinar" control={<Radio />} label="Webinar" />
-                                <FormControlLabel value="Any Other" control={<Radio />} label="Any Other" />
-                            </RadioGroup>
-                        </FormControl>
-
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            helperText="Write , If you have selected Any Other option.."
-                            label="Other Type"
-                            name="otherType"
-                            value={values.otherType}
-                            onChange={handleChange}
-                        />
-
-                        <FormControl fullWidth margin="normal" component="fieldset">
-                            <FormLabel component="legend">Mode of Event</FormLabel>
-                            <RadioGroup aria-label="type" name="mode" value={values.mode} onChange={handleChange}>
-                                <FormControlLabel value="Online" control={<Radio />} label="Online" />
-                                <FormControlLabel value="Offline" control={<Radio />} label="Offline" />
-                            </RadioGroup>
-                        </FormControl>
-
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            label="Academic Year"
-                            error={Boolean(touched.academicYear && errors.academicYear)}
-                            name="academicYear"
-                            value={values.academicYear}
-                            onChange={handleChange}
-                        />
-                        {touched.academicYear && errors.academicYear && (
-                            <FormHelperText error id="academic-year-error">
-                                {' '}
-                                {errors.academicYear}{' '}
-                            </FormHelperText>
-                        )}
-
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            label="Approved By"
-                            error={Boolean(touched.approvedBy && errors.approvedBy)}
-                            name="approvedBy"
-                            value={values.approvedBy}
-                            onChange={handleChange}
-                        />
-                        {touched.approvedBy && errors.approvedBy && (
-                            <FormHelperText error id="approved-by-error">
-                                {' '}
-                                {errors.approvedBy}{' '}
-                            </FormHelperText>
-                        )}
-
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            label="Scanned Copy of Certificate"
-                            name="file"
+                            select
                             InputLabelProps={{ shrink: true }}
-                            onChange={onFileChange}
-                            type="file"
+                            value={values.level}
+                            name="level"
+                            label="Level of Publication"
+                            fullWidth
+                            margin="normal"
+                            onBlur={handleBlur}
+                            onChange={handleChange}
+                            inputProps={{
+                                classes: {
+                                    notchedOutline: classes.notchedOutline
+                                }
+                            }}
+                        >
+                            {configData.PUBLICATION_LEVELS.map((e, index) => (
+                                <MenuItem key={index} value={e}>
+                                    {e}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+
+                        {values.type === 'Conference' && (
+                            <>
+                                <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    type="date"
+                                    label="From Date"
+                                    InputLabelProps={{ shrink: true }}
+                                    name="fromDate"
+                                    value={values.fromDate}
+                                    onChange={handleChange}
+                                />
+
+                                <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    type="date"
+                                    label="To Date"
+                                    InputLabelProps={{ shrink: true }}
+                                    error={Boolean(touched.toDate && errors.toDate)}
+                                    name="toDate"
+                                    value={values.toDate}
+                                    onChange={handleChange}
+                                />
+                                <>
+                                    {touched.toDate && errors.toDate && (
+                                        <FormHelperText error id="toDate-error">
+                                            {' '}
+                                            {errors.toDate}{' '}
+                                        </FormHelperText>
+                                    )}
+                                </>
+
+                                <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    label="Conference name"
+                                    name="conferenceName"
+                                    value={values.conferenceName}
+                                    onChange={handleChange}
+                                />
+
+                                <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    label="Organizer name"
+                                    name="organizer"
+                                    value={values.organizer}
+                                    onChange={handleChange}
+                                />
+
+                                <TextField fullWidth margin="normal" label="City" name="city" value={values.city} onChange={handleChange} />
+
+                                <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    label="State"
+                                    name="state"
+                                    value={values.state}
+                                    onChange={handleChange}
+                                />
+
+                                <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    label="Country"
+                                    name="country"
+                                    value={values.country}
+                                    onChange={handleChange}
+                                />
+                            </>
+                        )}
+
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Publisher name"
+                            error={Boolean(touched.publisher && errors.publisher)}
+                            name="publisher"
+                            value={values.publisher}
+                            onChange={handleChange}
                         />
 
+                        {touched.publisher && errors.publisher && (
+                            <FormHelperText error id="publisher-error">
+                                {' '}
+                                {errors.publisher}{' '}
+                            </FormHelperText>
+                        )}
+
+                        <TextField fullWidth margin="normal" label="Pages" name="pages" value={values.pages} onChange={handleChange} />
+
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Digital Object Identifier"
+                            name="doi"
+                            value={values.doi}
+                            onChange={handleChange}
+                        />
+
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="ISBN/ISSN Number"
+                            name="isbn"
+                            value={values.isbn}
+                            onChange={handleChange}
+                        />
+
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            type="date"
+                            label="Publication date"
+                            InputLabelProps={{ shrink: true }}
+                            name="publicationDate"
+                            value={values.publicationDate}
+                            onChange={handleChange}
+                        />
+                        {values.type !== 'Conference' && (
+                            <>
+                                <TextField fullWidth margin="normal" label="Link" name="link" value={values.link} onChange={handleChange} />
+
+                                <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    label="Volume No"
+                                    name="volumeNo"
+                                    value={values.volumeNo}
+                                    onChange={handleChange}
+                                />
+                                <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    label="Publication No"
+                                    name="publicationNo"
+                                    value={values.publicationNo}
+                                    onChange={handleChange}
+                                />
+                                <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    label="Impact Factor Value (Latest)"
+                                    name="impactFactor"
+                                    value={values.impactFactor}
+                                    onChange={handleChange}
+                                />
+                                <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    label="Impact Factor Year"
+                                    name="impactYear"
+                                    value={values.impactYear}
+                                    onChange={handleChange}
+                                />
+                                <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    label="Impact Factor Agency"
+                                    name="impactAgency"
+                                    value={values.impactAgency}
+                                    onChange={handleChange}
+                                />
+
+                                <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    label="H Index"
+                                    name="hIndex"
+                                    value={values.hIndex}
+                                    onChange={handleChange}
+                                />
+                            </>
+                        )}
+
+                        {values.type === 'Conference' && (
+                            <TextField
+                                fullWidth
+                                margin="normal"
+                                label="Affiliating institute name"
+                                name="institute"
+                                value={values.institute}
+                                onChange={handleChange}
+                            />
+                        )}
+
+                        <TextField
+                            select
+                            InputLabelProps={{ shrink: true }}
+                            value={values.academicYear}
+                            name="academicYear"
+                            label="Academic Year"
+                            fullWidth
+                            margin="normal"
+                            onBlur={handleBlur}
+                            onChange={handleChange}
+                            inputProps={{
+                                classes: {
+                                    notchedOutline: classes.notchedOutline
+                                }
+                            }}
+                        >
+                            {academicYears.map((e) => (
+                                <MenuItem key={e} value={e}>
+                                    {e}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                         {errors.submit && (
                             <Box
                                 sx={{
@@ -392,21 +614,13 @@ const AddResearchPaper = (props, { ...others }) => {
                                 <FormHelperText error>{errors.submit}</FormHelperText>
                             </Box>
                         )}
-
                         <Box
                             sx={{
                                 mt: 2
                             }}
                         >
-                            <Button
-                                disableElevation
-                                disabled={isSubmitting}
-                                size="large"
-                                type="submit"
-                                variant="contained"
-                                color="secondary"
-                            >
-                                {event ? 'UPDATE ' : 'ADD '} EVENT
+                            <Button disableElevation disabled={isSubmitting} size="large" type="submit" variant="contained" color="primary">
+                                {researchPaper ? 'Update' : 'Add'}
                             </Button>
                         </Box>
                     </form>

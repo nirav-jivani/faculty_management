@@ -8,6 +8,7 @@ app.use(fileUpload());
 app.use(express.json({ extended: false }));
 app.use("/api/users", require("./routes/auth"));
 app.use("/api/events", require("./routes/events"));
+app.use("/api/publications", require("./routes/publications"));
 app.use("/api/admin", require("./routes/admin"));
 
 app.get("/", (req, res) => res.send("API Running"));

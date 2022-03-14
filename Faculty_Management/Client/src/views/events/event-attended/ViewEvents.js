@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
 
 //==============================|| TYPOGRAPHY ||==============================//
 
-const ViewEvents = () => {
+const ViewEvents = (props, { ...others }) => {
     const classes = useStyles();
     const confirm = useConfirm();
     const account = useSelector((state) => state.account);
@@ -65,8 +65,11 @@ const ViewEvents = () => {
                     }
                 )
                 .then((response) => {
-                    if (response.success) {
-                        window.alert('Deleted Successfully');
+                    if (response.data.success) {
+                        // setEvents((prev) => {
+                        //     return prev.filter((e) => e.id !== event.id);
+                        // });
+                        props.setAlertMessage('Deleted Successfully');
                     }
                 });
         });

@@ -5,7 +5,11 @@ const config = {
     defaultPath: '/Home/index',
     fontFamily: `'Roboto', sans-serif`,
     borderRadius: 12,
-    API_SERVER: 'http://localhost:5000/api/'
+    API_SERVER: 'http://localhost:5000/api/',
+    EVENT_TYPES: ['FDP', 'Workshop', 'Seminar', 'STTP', 'Conference', 'AnyOther'],
+    EVENT_LEVELS: ['Local', 'National', 'International'],
+    PUBLICATION_LEVELS: ['National', 'International'],
+    FILE_SIZE: 1048576
 };
 
 export default config;

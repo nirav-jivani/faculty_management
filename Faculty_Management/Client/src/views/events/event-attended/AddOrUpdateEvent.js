@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { format } from 'date-fns';
@@ -15,7 +15,8 @@ import {
     FormHelperText,
     Radio,
     FormLabel,
-    RadioGroup
+    RadioGroup,
+    MenuItem
 } from '@material-ui/core';
 
 // third party
@@ -74,12 +75,37 @@ const AddOrUpdateEvent = (props, { ...others }) => {
     const location = useLocation();
     const history = useHistory();
     const scriptedRef = useScriptRef();
-    const [event, setEvent] = useState(location.state);
-    const [file, setFile] = useState();
-
     const account = useSelector((state) => state.account);
+    const [file, setFile] = useState(null);
+    const [fileError, setFileError] = useState('');
+    const [event, setEvent] = useState(location.state);
+    const [academicYears, setAcademicYears] = useState([]);
+    const [dateDiff, setDateDiff] = useState(
+        event ? Math.floor(Math.abs(Date.parse(event.EndDate) - Date.parse(event.StartDate)) / 86400000) + 1 : 1
+    );
+    const calculateYear = () => {
+        let start = 2000;
+        const end = new Date().getFullYear();
+        let years = [];
+        while (start !== end + 1) {
+            years.push(`${start}-${start + 1}`);
+            start++;
+        }
+        setAcademicYears(years);
+    };
+
+    useEffect(() => {
+        calculateYear();
+    }, []);
+
     const onFileChange = (event) => {
-        setFile(event.target.files[0]);
+        if (event.target.files[0] && event.target.files[0].size < configData.FILE_SIZE) {
+            setFile(event.target.files[0]);
+            setFileError('');
+        } else {
+            setFile(null);
+            setFileError('File size must be less than 1MB');
+        }
     };
 
     return (
@@ -91,14 +117,14 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                     organizedAt: event ? event.OrganizedAt : '',
                     fromDate: event ? format(new Date(event.StartDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
                     toDate: event ? format(new Date(event.EndDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
-                    duration: event ? event.Duration : '',
+                    duration: event ? parseInt(event.Duration) : 1,
                     speakerName: event ? event.SpeakerName : '',
                     topic: event ? event.EventTopic : '',
-                    level: event ? event.EventLevel : 'Local',
-                    type: event ? event.EventType : 'FDP',
+                    level: event ? event.EventLevel : configData.EVENT_LEVELS[0],
+                    type: event ? event.EventType : configData.EVENT_TYPES[0],
                     otherType: event ? event.OtherType : '',
                     mode: event ? event.EventMode : 'Online',
-                    academicYear: event ? event.AcademicYear : '',
+                    academicYear: event ? event.AcademicYear : `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`,
                     approvedBy: event ? event.ApprovedBy : ''
                 }}
                 validationSchema={Yup.object().shape({
@@ -107,7 +133,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                     organizedAt: Yup.string().required('Organized At is required'),
                     fromDate: Yup.date().required('From Date is required'),
                     toDate: Yup.date().min(Yup.ref('fromDate'), "To date can't be before From date"),
-                    duration: Yup.string().required('Duration is required'),
+                    duration: Yup.number().required('Duration is required').max(dateDiff),
                     speakerName: Yup.string().required('Speaker Name is required'),
                     topic: Yup.string().required('Topic Name is required'),
                     academicYear: Yup.string().required('Academic Year is required'),
@@ -126,7 +152,7 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                                 organizedAt: values.organizedAt,
                                 fromDate: values.fromDate,
                                 toDate: values.toDate,
-                                duration: values.duration,
+                                duration: values.duration.toString(),
                                 speakerName: values.speakerName,
                                 topic: values.topic,
                                 level: values.level,
@@ -229,7 +255,10 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             error={Boolean(touched.fromDate && errors.fromDate)}
                             name="fromDate"
                             value={values.fromDate}
-                            onChange={handleChange}
+                            onChange={(e) => {
+                                handleChange(e);
+                                setDateDiff(Math.floor(Math.abs(Date.parse(values.toDate) - Date.parse(e.target.value)) / 86400000) + 1);
+                            }}
                         />
                         {touched.fromDate && errors.fromDate && (
                             <FormHelperText error id="from-date-error">
@@ -247,7 +276,10 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             error={Boolean(touched.toDate && errors.toDate)}
                             name="toDate"
                             value={values.toDate}
-                            onChange={handleChange}
+                            onChange={(e) => {
+                                handleChange(e);
+                                setDateDiff(Math.floor(Math.abs(Date.parse(e.target.value) - Date.parse(values.fromDate)) / 86400000) + 1);
+                            }}
                         />
                         {touched.toDate && errors.toDate && (
                             <FormHelperText error id="to-date-error">
@@ -258,6 +290,13 @@ const AddOrUpdateEvent = (props, { ...others }) => {
 
                         <TextField
                             fullWidth
+                            type="number"
+                            InputProps={{
+                                inputProps: {
+                                    min: 1,
+                                    max: dateDiff
+                                }
+                            }}
                             margin="normal"
                             label="Duration(in days)"
                             error={Boolean(touched.duration && errors.duration)}
@@ -304,36 +343,62 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             </FormHelperText>
                         )}
 
-                        <FormControl fullWidth margin="normal" component="fieldset">
-                            <FormLabel component="legend">Level of Event</FormLabel>
-                            <RadioGroup aria-label="type" name="level" value={values.level} onChange={handleChange}>
-                                <FormControlLabel value="Local" control={<Radio />} label="Local" />
-                                <FormControlLabel value="National" control={<Radio />} label="National" />
-                                <FormControlLabel value="International" control={<Radio />} label="International" />
-                            </RadioGroup>
-                        </FormControl>
-
-                        <FormControl fullWidth margin="normal" component="fieldset">
-                            <FormLabel component="legend">Type of Event</FormLabel>
-                            <RadioGroup aria-label="type" name="type" value={values.type} onChange={handleChange}>
-                                <FormControlLabel value="FDP" control={<Radio />} label="FDP" />
-                                <FormControlLabel value="Workshop" control={<Radio />} label="Workshop" />
-                                <FormControlLabel value="Seminar" control={<Radio />} label="Seminar" />
-                                <FormControlLabel value="STTP" control={<Radio />} label="STTP" />
-                                <FormControlLabel value="Webinar" control={<Radio />} label="Webinar" />
-                                <FormControlLabel value="Any Other" control={<Radio />} label="Any Other" />
-                            </RadioGroup>
-                        </FormControl>
-
                         <TextField
+                            select
+                            InputLabelProps={{ shrink: true }}
+                            value={values.level}
+                            name="level"
+                            label="Level of Event"
                             fullWidth
                             margin="normal"
-                            helperText="Write , If you have selected Any Other option.."
-                            label="Other Type"
-                            name="otherType"
-                            value={values.otherType}
+                            onBlur={handleBlur}
                             onChange={handleChange}
-                        />
+                            inputProps={{
+                                classes: {
+                                    notchedOutline: classes.notchedOutline
+                                }
+                            }}
+                        >
+                            {configData.EVENT_LEVELS.map((e, index) => (
+                                <MenuItem key={index} value={e}>
+                                    {e}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+
+                        <TextField
+                            select
+                            InputLabelProps={{ shrink: true }}
+                            value={values.type}
+                            name="type"
+                            label="Type of Event"
+                            fullWidth
+                            margin="normal"
+                            onBlur={handleBlur}
+                            onChange={handleChange}
+                            inputProps={{
+                                classes: {
+                                    notchedOutline: classes.notchedOutline
+                                }
+                            }}
+                        >
+                            {configData.EVENT_TYPES.map((e, index) => (
+                                <MenuItem key={index} value={e}>
+                                    {e}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+
+                        {values.type === 'AnyOther' && (
+                            <TextField
+                                fullWidth
+                                margin="normal"
+                                label="Other Type"
+                                name="otherType"
+                                value={values.otherType}
+                                onChange={handleChange}
+                            />
+                        )}
 
                         <FormControl fullWidth margin="normal" component="fieldset">
                             <FormLabel component="legend">Mode of Event</FormLabel>
@@ -344,20 +409,27 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                         </FormControl>
 
                         <TextField
+                            select
+                            InputLabelProps={{ shrink: true }}
+                            value={values.academicYear}
+                            name="academicYear"
+                            label="Academic Year"
                             fullWidth
                             margin="normal"
-                            label="Academic Year"
-                            error={Boolean(touched.academicYear && errors.academicYear)}
-                            name="academicYear"
-                            value={values.academicYear}
+                            onBlur={handleBlur}
                             onChange={handleChange}
-                        />
-                        {touched.academicYear && errors.academicYear && (
-                            <FormHelperText error id="academic-year-error">
-                                {' '}
-                                {errors.academicYear}{' '}
-                            </FormHelperText>
-                        )}
+                            inputProps={{
+                                classes: {
+                                    notchedOutline: classes.notchedOutline
+                                }
+                            }}
+                        >
+                            {academicYears.map((e) => (
+                                <MenuItem key={e} value={e}>
+                                    {e}
+                                </MenuItem>
+                            ))}
+                        </TextField>
 
                         <TextField
                             fullWidth
@@ -380,10 +452,17 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                             margin="normal"
                             label="Scanned Copy of Certificate"
                             name="file"
+                            value={fileError === '' && file ? file.filename : ''}
                             InputLabelProps={{ shrink: true }}
                             onChange={onFileChange}
                             type="file"
                         />
+                        {fileError !== '' && (
+                            <FormHelperText error id="file-error">
+                                {' '}
+                                {fileError}{' '}
+                            </FormHelperText>
+                        )}
 
                         {errors.submit && (
                             <Box
@@ -400,15 +479,8 @@ const AddOrUpdateEvent = (props, { ...others }) => {
                                 mt: 2
                             }}
                         >
-                            <Button
-                                disableElevation
-                                disabled={isSubmitting}
-                                size="large"
-                                type="submit"
-                                variant="contained"
-                                color="secondary"
-                            >
-                                {event ? 'UPDATE ' : 'ADD '} EVENT
+                            <Button disableElevation disabled={isSubmitting} size="large" type="submit" variant="contained" color="primary">
+                                {event ? 'Update ' : 'Add '}
                             </Button>
                         </Box>
                     </form>

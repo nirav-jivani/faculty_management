@@ -3,8 +3,8 @@ const router = Router();
 const db = require("../database");
 const authenticateUser = require("../middlewares/validate");
 const bcrypt = require("bcryptjs");
-const nodemailer = require("nodemailer");
 const { EMAIL, PASSWORD } = require("./../config");
+const sendEmail = require("./../sendEmail");
 
 const generatePassword = () => {
   var length = 8,
@@ -20,26 +20,19 @@ router.post("/add-faculty", authenticateUser, async (req, res) => {
   try {
     const data = req.body;
     const Password = generatePassword();
-    let mailOptions;
-    let response;
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: EMAIL,
-        pass: PASSWORD,
-      },
-    });
+    let subject,
+      text,
+      response,
+      ccEmail = "";
+
     const facultyExist = await db
       .promise()
       .query("SELECT Username FROM faculties WHERE Username=?", [data.email]);
+    console.log(facultyExist);
     if (!data.id) {
-      mailOptions = {
-        from: EMAIL,
-        to: data.email,
-        subject: "DDU USER ACCOUNT PASSWORD",
-        text: `Congratulations , you are registered into ddu.\n\nUsername : ${data.email} \nPassword : ${Password}`,
-      };
-      if (facultyExist[0].length == 0) {
+      if (facultyExist[0].length === 0) {
+        subject = "DDU USER ACCOUNT PASSWORD";
+        text = `Congratulations , you are registered into ddu.</br></br>Username : ${data.email} \nPassword : ${Password}`;
         let salt = await bcrypt.genSalt(10);
         const password = await bcrypt.hash(Password, salt);
         response = await db
@@ -56,20 +49,28 @@ router.post("/add-faculty", authenticateUser, async (req, res) => {
               data.lastName,
             ]
           );
+        const user = await db
+          .promise()
+          .query("SELECT id FROM faculties WHERE Username=?", [data.email]);
+
+        await db
+          .promise()
+          .query("INSERT INTO faculty_roles (FactId,RoleId) VALUES(?,?)", [
+            user[0][0].id,
+            2,
+          ]);
       } else {
         response = false;
       }
     } else {
       if (
-        data.oldEmail === facultyExist[0][0].Username ||
-        facultyExist[0].length == 0
+        (facultyExist[0].length !== 0 &&
+          data.oldEmail === facultyExist[0][0].Username) ||
+        facultyExist[0].length === 0
       ) {
-        mailOptions = {
-          from: EMAIL,
-          to: data.email,
-          subject: "DDU USER ACCOUNT UPDATE",
-          text: `Your registered account is updated by admin....\n\nYour new username : ${data.email}`,
-        };
+        if (data.oldEmail !== data.email) ccEmail = data.oldEmail;
+        subject = "DDU USER ACCOUNT UPDATE";
+        text = `Your registered account is updated by admin.</br></br>Your new username : ${data.email}`;
 
         response = await db
           .promise()
@@ -90,11 +91,7 @@ router.post("/add-faculty", authenticateUser, async (req, res) => {
       }
     }
     if (Boolean(response)) {
-      transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          console.log(error);
-        }
-      });
+      sendEmail(data.email, subject, text, ccEmail);
       res.send({ success: true });
     } else res.send({ success: false, msg: "Email address already exist.." });
   } catch (err) {
@@ -124,8 +121,8 @@ router.get("/get-faculties/:isWorking", authenticateUser, async (req, res) => {
   try {
     const faculties = await db.promise().query(
       `SELECT *,f.id FROM faculties f inner join departments d on f.DeptId=d.id inner join designations ds on f.DesignationId = ds.id 
-        where UserType != ? and Working = ? `,
-      ["Admin", isWorking]
+        where f.id not in (select FactId from faculty_roles where RoleId= ?) and Working = ? `,
+      [1, isWorking]
     );
     res.json({ success: true, faculties: faculties[0] });
   } catch (err) {
@@ -141,7 +138,48 @@ router.post("/delete-faculty", authenticateUser, async (req, res) => {
       .query(`UPDATE faculties SET Working = ? WHERE id =?`, [0, req.body.id]);
     res.json({ success: true });
   } catch (err) {
-    console.log(err);
+    res.send({ data: { success: false, msg: "internal server errr" } });
+  }
+});
+
+router.get("/get-roles/:id", authenticateUser, async (req, res) => {
+  try {
+    const empId = req.params.id;
+    const roles = await db.promise().query(`SELECT * FROM roles`);
+
+    const empRoles = await db
+      .promise()
+      .query(
+        `SELECT * FROM roles WHERE id in (select RoleId from faculty_roles WHERE FactId = ?)`,
+        [empId]
+      );
+    let eroles = [];
+    for (var role of empRoles[0]) eroles.push(role.RoleName);
+    res.json({ empRoles: eroles, roles: roles[0], success: true });
+  } catch (err) {
+    res.send({ data: { success: false, msg: "internal server errr" } });
+  }
+});
+
+router.post("/update-roles", authenticateUser, async (req, res) => {
+  try {
+    const roles = req.body.roles;
+    await db
+      .promise()
+      .query(`DELETE FROM faculty_roles WHERE FactId=? `, [req.body.id]);
+    let roleIds = Object.keys(roles);
+    for (var roleId of roleIds) {
+      if (roles[roleId]) {
+        await db
+          .promise()
+          .query(`INSERT INTO faculty_roles (FactId,RoleId) VALUES (?,?) `, [
+            req.body.id,
+            roleId,
+          ]);
+      }
+    }
+    res.json({ success: true });
+  } catch (err) {
     res.send({ data: { success: false, msg: "internal server errr" } });
   }
 });

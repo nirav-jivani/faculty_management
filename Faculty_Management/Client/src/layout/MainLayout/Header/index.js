@@ -68,7 +68,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
             {/* smDown = this defines size for laptop and tablet*/}
             <Hidden smDown>
                 <Typography fontSize="2rem" fontWeight="bold">
-                    Dharamsinh Desai University
+                    Dharmsinh Desai University
                 </Typography>
             </Hidden>
             {/* smUp = this defines size for mobile */}

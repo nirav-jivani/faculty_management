@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux';
 const MenuList = () => {
     const account = useSelector((state) => state.account);
     const navItems = menuItem.items.map((item) => {
-        if (item.userType === account.user.UserType || item.userType === 'Both') {
+        if (account.user.Roles.includes(item.userType) || item.userType === 'All' || account.user.Roles.includes('Admin')) {
             switch (item.type) {
                 case 'group':
                     return <NavGroup key={item.id} item={item} />;

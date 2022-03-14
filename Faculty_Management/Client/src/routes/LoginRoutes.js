@@ -1,4 +1,4 @@
-import React, { lazy, useState} from 'react';
+import React, { lazy, useState } from 'react';
 import { Route, Switch, useLocation } from 'react-router-dom';
 
 // project imports
@@ -19,16 +19,31 @@ const LoginRoutes = () => {
     const [alertMessage, setAlertMessage] = useState('');
 
     return (
-        <Route path={['/login', '/change-password']}>
+        <Route path={['/login', '/change-password', '/forgot-password', '/reset-password']}>
             <MinimalLayout>
                 {alertMessage !== '' && <MyAlert message={alertMessage} setMessage={setAlertMessage} />}
                 <Switch location={location} key={location.pathname}>
                     <NavMotion>
                         <GuestGuard>
-                            <Route path="/login" render={Index} />
-                            <AuthGuard>
-                                <Route path="/change-password" render={() => <Index setAlertMessage={setAlertMessage} />} />
-                            </AuthGuard>
+                            <Route
+                                path="/forgot-password"
+                                render={() => <Index page="forgot-password" title="Forgot password" setAlertMessage={setAlertMessage} />}
+                            />
+                            <Route
+                                path="/reset-password/:token/:id"
+                                render={() => <Index page="reset-password" title="Reset password" setAlertMessage={setAlertMessage} />}
+                            />
+                            <Route path="/login" render={() => <Index page="login" title="Hi, Welcome Back" />} />
+                            {location.pathname === '/change-password' && (
+                                <AuthGuard>
+                                    <Route
+                                        path="/change-password"
+                                        render={() => (
+                                            <Index page="change-password" title="Change password" setAlertMessage={setAlertMessage} />
+                                        )}
+                                    />
+                                </AuthGuard>
+                            )}
                         </GuestGuard>
                     </NavMotion>
                 </Switch>

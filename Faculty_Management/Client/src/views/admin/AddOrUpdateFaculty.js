@@ -5,17 +5,7 @@ import { format } from 'date-fns';
 
 // material-ui
 import { makeStyles } from '@material-ui/styles';
-import {
-    Box,
-    TextField,
-    MenuItem,
-    Button,
-    FormControl,
-    FormHelperText,
-    InputLabel,
-    OutlinedInput,
-    Stack,
-} from '@material-ui/core';
+import { Box, TextField, MenuItem, Button, FormControl, FormHelperText, InputLabel, OutlinedInput, Stack } from '@material-ui/core';
 
 // third party
 import * as Yup from 'yup';
@@ -91,7 +81,7 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
     }, []);
 
     return (
-        <MainCard title={(employee ? 'Edit' : 'Add') + ' Faculty'}>
+        <MainCard title={employee ? `Edit Faculty "${employee.FirstName + ' ' + employee.LastName}"` : 'Add Faculty'}>
             <Formik
                 initialValues={{
                     email: employee ? employee.Username : '',
@@ -312,14 +302,7 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                                 mt: 2
                             }}
                         >
-                            <Button
-                                disableElevation
-                                disabled={isSubmitting}
-                                size="large"
-                                type="submit"
-                                variant="contained"
-                                color="secondary"
-                            >
+                            <Button disableElevation disabled={isSubmitting} size="large" type="submit" variant="contained" color="primary">
                                 {employee ? 'Edit' : 'Add'}
                             </Button>
                         </Box>

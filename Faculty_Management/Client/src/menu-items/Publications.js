@@ -1,20 +1,18 @@
 // assets
-import {
-    IconPlus, IconList, IconNews
-} from '@tabler/icons';
+import { IconPlus, IconList, IconNews } from '@tabler/icons';
 
 // constant
 const icons = {
-    IconPlus : IconPlus,
-    IconList : IconList,
-    IconNews : IconNews
+    IconPlus: IconPlus,
+    IconList: IconList,
+    IconNews: IconNews
 };
 //-----------------------|| UTILITIES MENU ITEMS ||-----------------------//
 
 export const Publications = {
     id: 'publications',
     title: 'Publications',
-    userType: 'Normal',
+    userType: 'Faculty',
     type: 'group',
     children: [
         {
@@ -32,10 +30,17 @@ export const Publications = {
                     icon: icons['IconPlus']
                 },
                 {
-                    id: 'view-research-papers',
-                    title: 'View Research Paper',
+                    id: 'view-conferences',
+                    title: 'View Conferences',
                     type: 'item',
-                    url: '/publications/view-research-papers',
+                    url: '/publications/view-conferences',
+                    icon: icons['IconList']
+                },
+                {
+                    id: 'view-journals',
+                    title: 'View Journals',
+                    type: 'item',
+                    url: '/publications/view-journals',
                     icon: icons['IconList']
                 }
             ]

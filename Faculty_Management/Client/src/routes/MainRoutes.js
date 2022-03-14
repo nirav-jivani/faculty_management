@@ -35,7 +35,12 @@ const ViewFaculties = Loadable(lazy(() => import('../views/admin/ViewFaculties')
 
 const MyAccount = Loadable(lazy(() => import('../views/accounts/MyAccount')));
 
+const ViewOrEditRoles = Loadable(lazy(() => import('../views/roles/ViewOrEditRoles')));
+
 const AddResearchPaper = Loadable(lazy(() => import('../views/publications/AddResearchPaper')));
+
+const ViewConferences = Loadable(lazy(() => import('../views/publications/ViewConferences')));
+const ViewJournals = Loadable(lazy(() => import('../views/publications/ViewJournals')));
 
 //-----------------------|| MAIN ROUTING ||-----------------------//
 
@@ -60,22 +65,28 @@ const MainRoutes = () => {
                 '/admin/add-faculty',
                 '/admin/edit-faculty',
                 '/admin/view-faculties',
-                
+
                 '/accounts/my-account',
-                
+                '/roles/view-or-edit-roles',
+
                 '/event-attended/add-event',
                 '/event-attended/view-events',
                 '/event-attended/update-event',
-                
+
                 '/event-conducted/add-event',
                 '/event-conducted/view-events',
                 '/event-conducted/update-event',
-                
+
                 '/event-organized/add-event',
                 '/event-organized/view-events',
                 '/event-organized/update-event',
 
-                '/publications/add-research-paper'
+                '/publications/add-research-paper',
+                '/publications/view-conferences',
+                '/publications/edit-conference',
+
+                '/publications/view-journals',
+                '/publications/edit-journal'
             ]}
         >
             {alertMessage !== '' && <MyAlert message={alertMessage} setMessage={setAlertMessage} />}
@@ -91,13 +102,14 @@ const MainRoutes = () => {
                         <Route path="/icons/form_elements" render={form_elements} />
                         <Route path="/icons/cards" render={cards} />
                         <Route path="/home/index" render={Home} />
-                        
+
                         <Route path="/admin/add-faculty" render={() => <AddOrUpdateFaculty setAlertMessage={setAlertMessage} />} />
                         <Route path="/admin/edit-faculty" render={() => <AddOrUpdateFaculty setAlertMessage={setAlertMessage} />} />
                         <Route path="/admin/view-faculties" render={() => <ViewFaculties setAlertMessage={setAlertMessage} />} />
-                        
+                        <Route path="/roles/view-or-edit-roles" render={() => <ViewOrEditRoles setAlertMessage={setAlertMessage} />} />
+
                         <Route path="/accounts/my-account" render={() => <MyAccount setAlertMessage={setAlertMessage} />} />
-                        
+
                         <Route
                             path="/event-attended/add-event"
                             render={() => <AddOrUpdateEventForAttended setAlertMessage={setAlertMessage} />}
@@ -106,7 +118,10 @@ const MainRoutes = () => {
                             path="/event-attended/update-event"
                             render={() => <AddOrUpdateEventForAttended setAlertMessage={setAlertMessage} />}
                         />
-                        <Route path="/event-attended/view-events" render={ViewEventsForAttended} />
+                        <Route
+                            path="/event-attended/view-events"
+                            render={() => <ViewEventsForAttended setAlertMessage={setAlertMessage} />}
+                        />
 
                         <Route
                             path="/event-conducted/add-event"
@@ -116,7 +131,10 @@ const MainRoutes = () => {
                             path="/event-conducted/update-event"
                             render={() => <AddOrUpdateEventForConducted setAlertMessage={setAlertMessage} />}
                         />
-                        <Route path="/event-conducted/view-events" render={ViewEventsForConducted} />
+                        <Route
+                            path="/event-conducted/view-events"
+                            render={() => <ViewEventsForConducted setAlertMessage={setAlertMessage} />}
+                        />
 
                         <Route
                             path="/event-organized/add-event"
@@ -126,9 +144,19 @@ const MainRoutes = () => {
                             path="/event-organized/update-event"
                             render={() => <AddOrUpdateEventForOrganized setAlertMessage={setAlertMessage} />}
                         />
-                        <Route path="/event-organized/view-events" render={ViewEventsForOrganized} />
-                        
-                        <Route path="/publications/add-research-paper" render={AddResearchPaper} />
+                        <Route
+                            path="/event-organized/view-events"
+                            render={() => <ViewEventsForOrganized setAlertMessage={setAlertMessage} />}
+                        />
+
+                        <Route
+                            path="/publications/add-research-paper"
+                            render={() => <AddResearchPaper setAlertMessage={setAlertMessage} />}
+                        />
+                        <Route path="/publications/view-conferences" render={() => <ViewConferences setAlertMessage={setAlertMessage} />} />
+                        <Route path="/publications/edit-conference" render={() => <AddResearchPaper setAlertMessage={setAlertMessage} />} />
+                        <Route path="/publications/view-journals" render={() => <ViewJournals setAlertMessage={setAlertMessage} />} />
+                        <Route path="/publications/edit-journal" render={() => <AddResearchPaper setAlertMessage={setAlertMessage} />} />
                     </AuthGuard>
                 </Switch>
             </MainLayout>
