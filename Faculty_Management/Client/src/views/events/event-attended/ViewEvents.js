@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 // material-ui
 import { useConfirm } from 'material-ui-confirm';
 import { makeStyles } from '@material-ui/styles';
-import { DataGrid } from '@material-ui/data-grid';
+import { DataGrid, GridToolbarExport, GridToolbarContainer } from '@material-ui/data-grid';
 import { Button, Stack } from '@material-ui/core';
 
 // project imports
@@ -23,6 +23,20 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 //==============================|| TYPOGRAPHY ||==============================//
+
+const Export = () => {
+    return (
+        <GridToolbarContainer>
+            <GridToolbarExport csvOptions = {{ allColumns: true, fileName : configData.EXPORTED_FILENAMES.event_attended }} />
+        </GridToolbarContainer>
+    );
+}
+
+const getType = (params) => {
+    if(params.row.EventType == "AnyOther")
+        return params.row.OtherType;
+    return params.row.EventType
+}
 
 const ViewEvents = (props, { ...others }) => {
     const classes = useStyles();
@@ -46,7 +60,7 @@ const ViewEvents = (props, { ...others }) => {
 
     useEffect(() => {
         getEvents();
-    }, [events]);
+    }, []);
 
     const onEditClick = () => {
         const event = events.find((e) => e.id === selectedEvent[0]);
@@ -66,9 +80,9 @@ const ViewEvents = (props, { ...others }) => {
                 )
                 .then((response) => {
                     if (response.data.success) {
-                        // setEvents((prev) => {
-                        //     return prev.filter((e) => e.id !== event.id);
-                        // });
+                        setEvents((prev) => {
+                            return prev.filter((e) => e.id !== event.id);
+                        });
                         props.setAlertMessage('Deleted Successfully');
                     }
                 });
@@ -91,8 +105,17 @@ const ViewEvents = (props, { ...others }) => {
     const columns = [
         { field: 'EventTitle', headerName: 'Title', flex: 1 },
         { field: 'EventTopic', headerName: 'Topic', flex: 1 },
-        { field: 'EventType', headerName: 'Event Type', flex: 1 },
-        { field: 'AcademicYear', headerName: 'Academic Year', flex: 1 }
+        { field: 'SpeakerName',headerName: 'Speaker', flex: 1, hide: true,  },
+        { field: 'OrganizedBy', headerName: 'Organized By', flex: 1, hide: true },
+        { field: 'OrganizedAt', headerName: 'Organized At', flex: 1, hide: true },
+        { field: 'StartDate', headerName: 'Start Date', flex: 1, hide: true },
+        { field: 'EndDate', headerName: 'End Date', flex: 1, hide: true },
+        { field: 'Duration', headerName: 'Duration (in days)', flex: 1, hide: true },
+        { field: 'EventType', headerName: 'Type', flex: 1, valueGetter: getType },
+        { field: 'EventLevel', headerName: 'Level', flex: 1, hide: true },
+        { field: 'EventMode', headerName: 'Mode', flex: 1, hide: true },
+        { field: 'ApprovedBy', headerName: 'Approved By', flex: 1, hide: true },
+        { field: 'AcademicYear', headerName: 'Academic Year', flex: 1 },
     ];
 
     return (
@@ -120,6 +143,9 @@ const ViewEvents = (props, { ...others }) => {
         >
             <div style={{ height: 650, width: '100%', backgroundColor: 'white' }}>
                 <DataGrid
+                    components={{
+                        Toolbar: Export
+                    }}
                     rows={events}
                     className={classes.root}
                     columns={columns}
@@ -136,12 +162,12 @@ const ViewEvents = (props, { ...others }) => {
                             if (result.length !== 0) {
                                 const event = events.find((e) => e.id === result[0]);
                                 console.log(event);
-                                event.CertificatePath !== null ? setIsFileAvailable(true) : setIsFileAvailable(false);
+                                event.CertificatePath !== "" ? setIsFileAvailable(true) : setIsFileAvailable(false);
                             }
                         } else {
                             if (selection.length !== 0) {
                                 const event = events.find((e) => e.id === selection[0]);
-                                event.CertificatePath !== null ? setIsFileAvailable(true) : setIsFileAvailable(false);
+                                event.CertificatePath !== "" ? setIsFileAvailable(true) : setIsFileAvailable(false);
                             }
                             setSelectedEvent(selection);
                         }
@@ -153,3 +179,6 @@ const ViewEvents = (props, { ...others }) => {
 };
 
 export default ViewEvents;
+
+
+

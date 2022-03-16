@@ -1,21 +1,17 @@
 import { React, useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import FileViewer from 'react-file-viewer';
+import { useSelector } from 'react-redux';
 
 // material-ui
 import { useConfirm } from 'material-ui-confirm';
-import MuiTypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/styles';
-import { DataGrid } from '@material-ui/data-grid';
-import { Link, FormControlLabel, Switch, FormGroup, Button, Stack } from '@material-ui/core';
+import { DataGrid, GridToolbarExport, GridToolbarContainer } from '@material-ui/data-grid';
+import { Button, Stack } from '@material-ui/core';
 // project imports
 import configData from './../../../config';
 import MainCard from './../../../ui-component/cards/MainCard';
-import { gridSpacing } from './../../../store/constant';
-// import EventForm from './../forms/EventForm';
-import axios from 'axios';
 
-import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -26,6 +22,20 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 //==============================|| TYPOGRAPHY ||==============================//
+
+const Export = () => {
+    return (
+        <GridToolbarContainer>
+            <GridToolbarExport csvOptions={{ allColumns: true, fileName : configData.EXPORTED_FILENAMES.event_conducted }} />
+        </GridToolbarContainer>
+    );
+}
+
+const getType = (params) => {
+    if (params.row.EventType == "AnyOther")
+        return params.row.OtherType;
+    return params.row.EventType
+}
 
 const ViewEvents = (props, { ...others }) => {
     const classes = useStyles();
@@ -94,8 +104,17 @@ const ViewEvents = (props, { ...others }) => {
     const columns = [
         { field: 'EventTitle', headerName: 'Title', flex: 1 },
         { field: 'EventTopic', headerName: 'Topic', flex: 1 },
-        { field: 'EventType', headerName: 'Event Type', flex: 1 },
-        { field: 'AcademicYear', headerName: 'Academic Year', flex: 1 }
+        { field: 'OrganizedBy', headerName: 'Organized By', flex: 1, hide: true },
+        { field: 'ConductedAt', headerName: 'Conducted At', flex: 1, hide: true },
+        { field: 'TotalParticipants', headerName: 'Total Participants', flex: 1, hide: true },
+        { field: 'StartDate', headerName: 'Start Date', flex: 1, hide: true },
+        { field: 'EndDate', headerName: 'End Date', flex: 1, hide: true },
+        { field: 'Duration', headerName: 'Duration (in days)', flex: 1, hide: true },
+        { field: 'EventType', headerName: 'Type', flex: 1, valueGetter: getType },
+        { field: 'EventLevel', headerName: 'Level', flex: 1, hide: true },
+        { field: 'EventMode', headerName: 'Mode', flex: 1, hide: true },
+        { field: 'ApprovedBy', headerName: 'Approved By', flex: 1, hide: true },
+        { field: 'AcademicYear', headerName: 'Academic Year', flex: 1 },
     ];
 
     return (
@@ -123,6 +142,9 @@ const ViewEvents = (props, { ...others }) => {
         >
             <div style={{ height: 650, width: '100%', backgroundColor: 'white' }}>
                 <DataGrid
+                    components={{
+                        Toolbar: Export
+                    }}
                     rows={events}
                     className={classes.root}
                     columns={columns}

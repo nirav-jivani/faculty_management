@@ -28,7 +28,6 @@ router.post("/add-faculty", authenticateUser, async (req, res) => {
     const facultyExist = await db
       .promise()
       .query("SELECT Username FROM faculties WHERE Username=?", [data.email]);
-    console.log(facultyExist);
     if (!data.id) {
       if (facultyExist[0].length === 0) {
         subject = "DDU USER ACCOUNT PASSWORD";
@@ -38,7 +37,7 @@ router.post("/add-faculty", authenticateUser, async (req, res) => {
         response = await db
           .promise()
           .query(
-            "INSERT INTO faculties (Username,Password,JoinDate,DeptId,DesignationId,FirstName,LastName) VALUES(?,?,?,?,?,?,?)",
+            "INSERT INTO faculties (Username,Password,JoinDate,DeptId,DesignationId,FirstName,LastName, Initials) VALUES(?,?,?,?,?,?,?,?)",
             [
               data.email,
               password,
@@ -47,6 +46,7 @@ router.post("/add-faculty", authenticateUser, async (req, res) => {
               data.designation,
               data.firstName,
               data.lastName,
+              data.initials
             ]
           );
         const user = await db
@@ -75,7 +75,7 @@ router.post("/add-faculty", authenticateUser, async (req, res) => {
         response = await db
           .promise()
           .query(
-            "UPDATE faculties SET Username=?,JoinDate=?,DeptId=?,DesignationId=?,FirstName=?,LastName=? WHERE id = ?",
+            "UPDATE faculties SET Username=?,JoinDate=?,DeptId=?,DesignationId=?,FirstName=?,LastName=?,Initials=? WHERE id = ?",
             [
               data.email,
               data.joinDate,
@@ -83,6 +83,7 @@ router.post("/add-faculty", authenticateUser, async (req, res) => {
               data.designation,
               data.firstName,
               data.lastName,
+              data.initials,
               data.id,
             ]
           );
@@ -95,7 +96,6 @@ router.post("/add-faculty", authenticateUser, async (req, res) => {
       res.send({ success: true });
     } else res.send({ success: false, msg: "Email address already exist.." });
   } catch (err) {
-    console.log(err);
     res.send({ success: false, msg: "internal server errr" });
   }
 });
@@ -104,14 +104,12 @@ router.get("/get-dept-designations", authenticateUser, async (req, res) => {
   try {
     const departments = await db.promise().query(`SELECT * FROM departments`);
     const designations = await db.promise().query(`SELECT * FROM designations`);
-    //console.log(departments[0]);
     res.json({
       success: true,
       deptList: departments[0],
       designationList: designations[0],
     });
   } catch (err) {
-    console.log(err);
     res.send({ data: { success: false, msg: "internal server errr" } });
   }
 });
@@ -126,7 +124,6 @@ router.get("/get-faculties/:isWorking", authenticateUser, async (req, res) => {
     );
     res.json({ success: true, faculties: faculties[0] });
   } catch (err) {
-    console.log(err);
     res.send({ data: { success: false, msg: "internal server errr" } });
   }
 });

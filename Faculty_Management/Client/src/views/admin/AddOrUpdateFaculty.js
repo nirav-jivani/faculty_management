@@ -89,13 +89,15 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                     department: employee ? employee.DeptId : '',
                     designation: employee ? employee.DesignationId : '',
                     firstName: employee ? employee.FirstName : '',
-                    lastName: employee ? employee.LastName : ''
+                    lastName: employee ? employee.LastName : '',
+                    initials: employee ? employee.Initials : ''
                 }}
                 validationSchema={Yup.object().shape({
                     email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
                     joinDate: Yup.string().max(255).required('Join Date is required'),
                     department: Yup.string().required('Department is required'),
-                    designation: Yup.string().required('Designation is required')
+                    designation: Yup.string().required('Designation is required'),
+                    initials: Yup.string().required('Initials is required')
                 })}
                 onSubmit={(values, { setErrors, setStatus, setSubmitting }) => {
                     try {
@@ -110,7 +112,8 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                                     department: values.department,
                                     designation: values.designation,
                                     firstName: values.firstName,
-                                    lastName: values.lastName
+                                    lastName: values.lastName,
+                                    initials : values.initials
                                 },
                                 { headers: { 'x-auth-token': account.token } }
                             )
@@ -134,7 +137,6 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                                 setSubmitting(false);
                             });
                     } catch (err) {
-                        console.error(err);
                         if (scriptedRef.current) {
                             setStatus({ success: false });
                             setErrors({ submit: err.message });
@@ -180,30 +182,53 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                                 />
                             </FormControl>
                         </Stack>
-                        <FormControl fullWidth error={Boolean(touched.email && errors.email)} className={classes.loginInput}>
-                            <InputLabel htmlFor="email">Email</InputLabel>
-                            <OutlinedInput
-                                id="email"
-                                type="email"
-                                value={values.email}
-                                name="email"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                label="Email Address"
-                                inputProps={{
-                                    classes: {
-                                        className: classes.placeHolder,
-                                        notchedOutline: classes.notchedOutline
-                                    }
-                                }}
-                            />
-                            {touched.email && errors.email && (
-                                <FormHelperText error id="email-error">
-                                    {' '}
-                                    {errors.email}{' '}
-                                </FormHelperText>
-                            )}
-                        </FormControl>
+                        <Stack direction="row" justifyContent="center" spacing={2} alignItems="center">
+                            <FormControl fullWidth error={Boolean(touched.email && errors.email)} className={classes.loginInput}>
+                                <InputLabel htmlFor="email">Email</InputLabel>
+                                <OutlinedInput
+                                    id="email"
+                                    type="email"
+                                    value={values.email}
+                                    name="email"
+                                    onBlur={handleBlur}
+                                    onChange={handleChange}
+                                    inputProps={{
+                                        classes: {
+                                            className: classes.placeHolder,
+                                            notchedOutline: classes.notchedOutline
+                                        }
+                                    }}
+                                />
+                                {touched.email && errors.email && (
+                                    <FormHelperText error id="email-error">
+                                        {' '}
+                                        {errors.email}{' '}
+                                    </FormHelperText>
+                                )}
+                            </FormControl>
+                            <FormControl fullWidth error={Boolean(touched.initials && errors.initials)} className={classes.loginInput}>
+                                <InputLabel htmlFor="initials">Initials</InputLabel>
+                                <OutlinedInput
+                                    id="initials"
+                                    value={values.initials}
+                                    name="initials"
+                                    onBlur={handleBlur}
+                                    onChange={handleChange}
+                                    inputProps={{
+                                        classes: {
+                                            className: classes.placeHolder,
+                                            notchedOutline: classes.notchedOutline
+                                        }
+                                    }}
+                                />
+                                {touched.initials && errors.initials && (
+                                    <FormHelperText error id="initials-error">
+                                        {' '}
+                                        {errors.initials}{' '}
+                                    </FormHelperText>
+                                )}
+                            </FormControl>
+                        </Stack>
 
                         <TextField
                             select

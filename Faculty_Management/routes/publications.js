@@ -168,7 +168,6 @@ router.post(
 
       res.json({ success: true });
     } catch (err) {
-      console.log(err);
       const data = { success: false, msg: "internal server Error" };
       res.status(500).json(data);
     }
@@ -194,7 +193,6 @@ router.get("/get-conferences", authenticateUser, async (req, res) => {
     }
     res.json(conferences);
   } catch (err) {
-    console.log(err);
     const data = { success: false, msg: "internal server Error" };
     res.status(500).json(data);
   }
@@ -213,12 +211,10 @@ router.get("/get-journals", authenticateUser, async (req, res) => {
           "SELECT a.id,Name,Department,Organization FROM journal_authors ja INNER JOIN authors a WHERE ja.AuthId = a.id and ja.JournalId = ? ORDER BY  ja.id ASC",
           [journals[i].id]
         );
-      console.log(authors[0]);
       journals[i].authors = authors[0];
     }
     res.json(journals);
   } catch (err) {
-    console.log(err);
     const data = { success: false, msg: "internal server Error" };
     res.status(500).json(data);
   }
@@ -234,7 +230,6 @@ router.post("/delete-conference", authenticateUser, async (req, res) => {
       .query("DELETE FROM research_conferences WHERE id=?", [req.body.id]);
     res.json({ success: true });
   } catch (err) {
-    console.log(err);
     const data = { success: false, msg: "internal server Error" };
     res.status(500).json(data);
   }
@@ -251,7 +246,6 @@ router.post("/delete-journal", authenticateUser, async (req, res) => {
       .query("DELETE FROM research_journals WHERE id=?", [req.body.id]);
     res.json({ success: true });
   } catch (err) {
-    console.log(err);
     const data = { success: false, msg: "internal server Error" };
     res.status(500).json(data);
   }

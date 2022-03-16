@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 // material-ui
 import { useConfirm } from 'material-ui-confirm';
 import { makeStyles } from '@material-ui/styles';
-import { DataGrid } from '@material-ui/data-grid';
+import { DataGrid, GridToolbarExport, GridToolbarContainer } from '@material-ui/data-grid';
 import { Button, Stack } from '@material-ui/core';
 
 // project imports
@@ -24,35 +24,43 @@ const useStyles = makeStyles((theme) => ({
 
 //==============================|| TYPOGRAPHY ||==============================//
 
+const Export = () => {
+    return (
+        <GridToolbarContainer>
+            <GridToolbarExport csvOptions = {{ allColumns: true, fileName : configData.EXPORTED_FILENAMES.reaserch_paper_conference }} />
+        </GridToolbarContainer>
+    );
+}
+
 const ViewConferences = (props) => {
     const classes = useStyles();
     const confirm = useConfirm();
     const account = useSelector((state) => state.account);
     const [conferences, setConferences] = useState([]);
     const [selectedConference, setSelectedConference] = useState([]);
-
+    
     const history = useHistory();
-
+    
     const getConferences = () => {
         axios
-            .get(configData.API_SERVER + 'publications/get-conferences', {
-                headers: { 'x-auth-token': account.token }
-            })
-            .then((response) => {
-                setConferences(response.data);
-            });
+        .get(configData.API_SERVER + 'publications/get-conferences', {
+            headers: { 'x-auth-token': account.token }
+        })
+        .then((response) => {
+            setConferences(response.data);
+        });
     };
-
+    
     useEffect(() => {
         getConferences();
     }, [conferences]);
-
+    
     const onEditClick = () => {
         let conference = conferences.find((e) => e.id === selectedConference[0]);
         conference.type = 'Conference';
         history.push({ pathname: '/publications/edit-conference', state: conference, replace: true });
     };
-
+    
     const onDeleteClick = async () => {
         const conference = conferences.find((e) => e.id === selectedConference[0]);
         confirm({ description: `Conference "${conference.ConferenceTitle}" will be permanently deleted.` }).then(() => {
@@ -63,27 +71,39 @@ const ViewConferences = (props) => {
                     {
                         headers: { 'x-auth-token': account.token }
                     }
-                )
-                .then((response) => {
-                    if (response.data.success) {
-                        props.setAlertMessage('Deleted Successfully');
-                    }
-                });
+                    )
+                    .then((response) => {
+                        if (response.data.success) {
+                            props.setAlertMessage('Deleted Successfully');
+                        }
+                    });
         });
     };
-
+    
     const columns = [
         { field: 'ResearchTitle', headerName: 'Research Paper Title', flex: 1 },
+        { field: 'Publisher', headerName: 'Punblisher', flex: 1 },
+        { field: 'PublicationDate', headerName: 'Publication Date', hide: true },
         { field: 'ConferenceTitle', headerName: 'Conference Title', flex: 1 },
         { field: 'ConferenceName', headerName: 'Conference Name', flex: 1 },
-        { field: 'Publisher', headerName: 'Punblisher', flex: 1 },
-        { field: 'AcademicYear', headerName: 'Academic Year', flex: 1 }
+        { field: 'Organizer', headerName: 'Organizer', hide: true },
+        { field: 'StartDate', headerName: 'Start Date', hide: true },
+        { field: 'EndDate', headerName: 'End Date', hide: true },
+        { field: 'Level', headerName: 'Level', hide: true },
+        { field: 'City', headerName: 'City', hide: true },
+        { field: 'State', headerName: 'State', hide: true },
+        { field: 'Country', headerName: 'Country', hide: true },
+        { field: 'Pages', headerName: 'Pages', hide: true },
+        { field: 'DOI', headerName: 'Digital Object Identifier', hide: true },
+        { field: 'ISBN', headerName: 'ISBN/ISSN', hide: true },
+        { field: 'AffiliatingInstitute', headerName: 'Affiliating Institute', hide: true },
+        { field: 'AcademicYear', headerName: 'Academic Year', flex: 1 },
     ];
-
+    
     return (
         <MainCard
-            title="View Conferences"
-            secondary={
+        title="View Conferences"
+        secondary={
                 <Stack direction="row" spacing={2} alignItems="center">
                     {selectedConference.length > 0 && (
                         <>
@@ -97,9 +117,12 @@ const ViewConferences = (props) => {
                     )}
                 </Stack>
             }
-        >
+            >
             <div style={{ height: 650, width: '100%', backgroundColor: 'white' }}>
                 <DataGrid
+                    components={{
+                        Toolbar: Export
+                    }}
                     rows={conferences}
                     className={classes.root}
                     columns={columns}
@@ -116,7 +139,7 @@ const ViewConferences = (props) => {
                             setSelectedConference(selection);
                         }
                     }}
-                />
+                    />
             </div>
         </MainCard>
     );

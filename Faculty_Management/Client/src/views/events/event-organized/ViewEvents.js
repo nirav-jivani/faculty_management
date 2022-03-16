@@ -1,21 +1,18 @@
 import { React, useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import FileViewer from 'react-file-viewer';
+import { useSelector } from 'react-redux';
 
 // material-ui
 import { useConfirm } from 'material-ui-confirm';
-import MuiTypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/styles';
-import { DataGrid } from '@material-ui/data-grid';
+import { DataGrid, GridToolbarExport, GridToolbarContainer } from '@material-ui/data-grid';
 import { Link, FormControlLabel, Switch, FormGroup, Button, Stack } from '@material-ui/core';
+
 // project imports
 import configData from './../../../config';
 import MainCard from './../../../ui-component/cards/MainCard';
-import { gridSpacing } from './../../../store/constant';
-// import EventForm from './../forms/EventForm';
-import axios from 'axios';
 
-import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -27,6 +24,20 @@ const useStyles = makeStyles((theme) => ({
 
 //==============================|| TYPOGRAPHY ||==============================//
 
+const Export = () => {
+    return (
+        <GridToolbarContainer>
+            <GridToolbarExport csvOptions = {{ allColumns: true, fileName : configData.EXPORTED_FILENAMES.event_organized }} />
+        </GridToolbarContainer>
+    );
+}
+
+const getType = (params) => {
+    if(params.row.EventType == "AnyOther")
+    return params.row.OtherType;
+    return params.row.EventType
+}
+
 const ViewEvents = (props, { ...others }) => {
     const classes = useStyles();
     const confirm = useConfirm();
@@ -34,48 +45,48 @@ const ViewEvents = (props, { ...others }) => {
     const [events, setEvents] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState([]);
     const [isFileAvailable, setIsFileAvailable] = useState(false);
-
+    
     const history = useHistory();
-
+    
     const getEvents = () => {
         axios
-            .get(configData.API_SERVER + 'events/get-events-organized', {
-                headers: { 'x-auth-token': account.token }
-            })
-            .then((response) => {
-                setEvents(response.data);
-            });
+        .get(configData.API_SERVER + 'events/get-events-organized', {
+            headers: { 'x-auth-token': account.token }
+        })
+        .then((response) => {
+            setEvents(response.data);
+        });
     };
-
+    
     useEffect(() => {
         getEvents();
     }, [events]);
-
+    
     const onEditClick = () => {
         const event = events.find((e) => e.id === selectedEvent[0]);
         history.push({ pathname: '/event-organized/update-event', state: event, replace: true });
     };
-
+    
     const onDeleteClick = async () => {
         const event = events.find((e) => e.id === selectedEvent[0]);
         confirm({ description: `Event "${event.EventTitle}" will be permanently deleted.` }).then(() => {
             axios
-                .post(
-                    configData.API_SERVER + 'events/delete-event-organized',
-                    { id: selectedEvent[0] },
+            .post(
+                configData.API_SERVER + 'events/delete-event-organized',
+                { id: selectedEvent[0] },
                     {
                         headers: { 'x-auth-token': account.token }
                     }
-                )
-                .then((response) => {
+                    )
+                    .then((response) => {
                     if (response.data.success) {
                         // setEvents((prev) => {
-                        //     return prev.filter((e) => e.id !== event.id);
-                        // });
-                        props.setAlertMessage('Deleted Successfully');
-                    }
+                            //     return prev.filter((e) => e.id !== event.id);
+                            // });
+                            props.setAlertMessage('Deleted Successfully');
+                        }
+                    });
                 });
-        });
     };
 
     const onViewClick = () => {
@@ -90,19 +101,27 @@ const ViewEvents = (props, { ...others }) => {
             }
         });
     };
-
+    
     const columns = [
         { field: 'EventTitle', headerName: 'Title', flex: 1 },
         { field: 'EventTopic', headerName: 'Topic', flex: 1 },
-        { field: 'EventType', headerName: 'Event Type', flex: 1 },
-        { field: 'AcademicYear', headerName: 'Academic Year', flex: 1 }
+        { field: 'SpeakerName', headerName: 'Speaker', flex: 1, hide: true },
+        { field: 'TotalParticipants', headerName: 'Total Participants', flex: 1, hide: true },
+        { field: 'StartDate', headerName: 'Start Date', flex: 1, hide: true },
+        { field: 'EndDate', headerName: 'End Date', flex: 1, hide: true },
+        { field: 'Duration', headerName: 'Duration (in days)', flex: 1, hide: true },
+        { field: 'EventType', headerName: 'Type', flex: 1, valueGetter: getType },
+        { field: 'EventLevel', headerName: 'Level', flex: 1, hide: true },
+        { field: 'EventMode', headerName: 'Mode', flex: 1, hide: true },
+        { field: 'ApprovedBy', headerName: 'Approved By', flex: 1, hide: true },
+        { field: 'AcademicYear', headerName: 'Academic Year', flex: 1 },
     ];
-
+    
     return (
         <MainCard
-            title="View Events (Organized)"
-            secondary={
-                <Stack direction="row" spacing={2} alignItems="center">
+        title="View Events (Organized)"
+        secondary={
+            <Stack direction="row" spacing={2} alignItems="center">
                     {selectedEvent.length > 0 && (
                         <>
                             {isFileAvailable && (
@@ -123,6 +142,9 @@ const ViewEvents = (props, { ...others }) => {
         >
             <div style={{ height: 650, width: '100%', backgroundColor: 'white' }}>
                 <DataGrid
+                    components={{
+                        Toolbar: Export
+                    }}
                     rows={events}
                     className={classes.root}
                     columns={columns}

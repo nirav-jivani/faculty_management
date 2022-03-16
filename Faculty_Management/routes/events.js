@@ -21,7 +21,6 @@ const deleteFile = (path) => {
 
 //Event Attended ------start------
 
-//add or update event
 router.post(
   "/add-or-update-event-attended",
   authenticateUser,
@@ -33,7 +32,6 @@ router.post(
         createDir(`${dirpath}/${req.user.id.toString()}`);
 
         const file = req.files.myfile;
-        console.log(file);
         const temp = file.name.split(".");
         fileName = `${temp
           .slice(0, -1)
@@ -109,7 +107,6 @@ router.post(
       }
       res.json({ success: true });
     } catch (err) {
-      console.log(err);
       const data = { success: false, msg: "internal server Error" };
       res.status(500).json(data);
     }
@@ -123,7 +120,6 @@ router.get("/get-events-attended", authenticateUser, async (req, res) => {
       .query("SELECT * FROM event_attended WHERE FactId=?", [req.user.id]);
     res.json(data[0]);
   } catch (err) {
-    console.log(err);
     const data = { success: false, msg: "internal server Error" };
     res.status(500).json(data);
   }
@@ -145,7 +141,6 @@ router.post("/delete-event-attended", authenticateUser, async (req, res) => {
       .query("DELETE FROM event_attended WHERE id=?", [req.body.id]);
     res.json({ success: true });
   } catch (err) {
-    console.log(err);
     const data = { success: false, msg: "internal server Error" };
     res.status(500).json(data);
   }
@@ -185,7 +180,6 @@ router.post(
         createDir(`${dirpath}/${req.user.id.toString()}`);
 
         const file = req.files.myfile;
-        console.log(file);
         const temp = file.name.split(".");
         fileName = `${temp
           .slice(0, -1)
@@ -261,7 +255,6 @@ router.post(
       }
       res.json({ success: true });
     } catch (err) {
-      console.log(err);
       const data = { success: false, msg: "internal server Error" };
       res.status(500).json(data);
     }
@@ -275,7 +268,6 @@ router.get("/get-events-conducted", authenticateUser, async (req, res) => {
       .query("SELECT * FROM event_conducted WHERE FactId=?", [req.user.id]);
     res.json(data[0]);
   } catch (err) {
-    console.log(err);
     const data = { success: false, msg: "internal server Error" };
     res.status(500).json(data);
   }
@@ -296,7 +288,6 @@ router.post("/delete-event-conducted", authenticateUser, async (req, res) => {
       .query("DELETE FROM event_conducted WHERE id=?", [req.body.id]);
     res.json({ success: true });
   } catch (err) {
-    console.log(err);
     const data = { success: false, msg: "internal server Error" };
     res.status(500).json(data);
   }
@@ -336,7 +327,6 @@ router.post(
         createDir(`${dirpath}/${req.user.id.toString()}`);
 
         const file = req.files.myfile;
-        console.log(file);
         const temp = file.name.split(".");
         fileName = `${temp
           .slice(0, -1)
@@ -410,7 +400,6 @@ router.post(
       }
       res.json({ success: true });
     } catch (err) {
-      console.log(err);
       const data = { success: false, msg: "internal server Error" };
       res.status(500).json(data);
     }
@@ -424,7 +413,6 @@ router.get("/get-events-organized", authenticateUser, async (req, res) => {
       .query("SELECT * FROM event_organized WHERE FactId=?", [req.user.id]);
     res.json(data[0]);
   } catch (err) {
-    console.log(err);
     const data = { success: false, msg: "internal server Error" };
     res.status(500).json(data);
   }
@@ -445,7 +433,6 @@ router.post("/delete-event-organized", authenticateUser, async (req, res) => {
       .query("DELETE FROM event_organized WHERE id=?", [req.body.id]);
     res.json({ success: true });
   } catch (err) {
-    console.log(err);
     const data = { success: false, msg: "internal server Error" };
     res.status(500).json(data);
   }

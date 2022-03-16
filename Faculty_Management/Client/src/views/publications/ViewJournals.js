@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 // material-ui
 import { useConfirm } from 'material-ui-confirm';
 import { makeStyles } from '@material-ui/styles';
-import { DataGrid } from '@material-ui/data-grid';
+import { DataGrid, GridToolbarExport, GridToolbarContainer } from '@material-ui/data-grid';
 import { Button, Stack } from '@material-ui/core';
 
 // project imports
@@ -24,41 +24,50 @@ const useStyles = makeStyles((theme) => ({
 
 //==============================|| TYPOGRAPHY ||==============================//
 
+const Export = () => {
+    return (
+        <GridToolbarContainer>
+            <GridToolbarExport csvOptions = {{ allColumns: true, fileName : configData.EXPORTED_FILENAMES.reaserch_paper_journal }} />
+        </GridToolbarContainer>
+    );
+}
+
 const ViewJournals = (props) => {
     const classes = useStyles();
     const confirm = useConfirm();
     const account = useSelector((state) => state.account);
     const [journals, setJournals] = useState([]);
     const [selectedJournal, setSelectedJournal] = useState([]);
-
+    
     const history = useHistory();
-
+    
     const getConferences = () => {
         axios
-            .get(configData.API_SERVER + 'publications/get-journals', {
-                headers: { 'x-auth-token': account.token }
-            })
-            .then((response) => {
-                setJournals(response.data);
+        .get(configData.API_SERVER + 'publications/get-journals', {
+            headers: { 'x-auth-token': account.token }
+        })
+        .then((response) => {
+            console.log(response.data)
+            setJournals(response.data);
             });
     };
-
+    
     useEffect(() => {
         getConferences();
-    }, [journals]);
+    }, []);
 
     const onEditClick = () => {
         let journal = journals.find((e) => e.id === selectedJournal[0]);
         journal.type = 'Journal';
         history.push({ pathname: '/publications/edit-journal', state: journal, replace: true });
     };
-
+    
     const onDeleteClick = async () => {
         const journal = journals.find((e) => e.id === selectedJournal[0]);
         confirm({ description: `Journal "${journal.JournalTitle}" will be permanently deleted.` }).then(() => {
             axios
-                .post(
-                    configData.API_SERVER + 'publications/delete-journal',
+            .post(
+                configData.API_SERVER + 'publications/delete-journal',
                     { id: selectedJournal[0] },
                     {
                         headers: { 'x-auth-token': account.token }
@@ -71,12 +80,24 @@ const ViewJournals = (props) => {
                 });
         });
     };
-
+    
     const columns = [
         { field: 'ResearchTitle', headerName: 'Research Paper Title', flex: 1 },
-        { field: 'JournalTitle', headerName: 'Journal Title', flex: 1 },
         { field: 'Publisher', headerName: 'Punblisher', flex: 1 },
-        { field: 'AcademicYear', headerName: 'Academic Year', flex: 1 }
+        { field: 'PublicationDate', headerName: 'Publication Date', hide: true },
+        { field: 'JournalTitle', headerName: 'Journal Title', flex: 1 },
+        { field: 'Link', headerName: 'Link', hide: true },
+        { field: 'Level', headerName: 'Level', hide: true },
+        { field: 'Pages', headerName: 'Pages', hide: true },
+        { field: 'VolumeNo', headerName: 'Volume No', hide: true },
+        { field: 'PublicationNo', headerName: 'Publication No', hide: true },
+        { field: 'DOI', headerName: 'Digital Object Identifier', hide: true },
+        { field: 'ISBN', headerName: 'ISBN/ISSN', hide: true },
+        { field: 'ImpactFactor', headerName: 'Impact Factor', hide: true },
+        { field: 'ImpactFactorYear', headerName: 'Impact Factor Year', hide: true },
+        { field: 'ImpactFactorAgency', headerName: 'Impact Factor Agency', hide: true },
+        { field: 'HIndex', headerName: 'H-Index', hide: true },
+        { field: 'AcademicYear', headerName: 'Academic Year', flex: 1 },
     ];
 
     return (
@@ -96,9 +117,12 @@ const ViewJournals = (props) => {
                     )}
                 </Stack>
             }
-        >
+            >
             <div style={{ height: 650, width: '100%', backgroundColor: 'white' }}>
                 <DataGrid
+                    components={{
+                        Toolbar: Export
+                    }}
                     rows={journals}
                     className={classes.root}
                     columns={columns}

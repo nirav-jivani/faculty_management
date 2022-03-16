@@ -127,7 +127,8 @@ const MyAccount = (props, { ...others }) => {
                                         birthDate: values.birthDate,
                                         gender: values.gender,
                                         yoe: values.yoe,
-                                        qualification: values.qualification
+                                        qualification: values.qualification,
+                                        roles : account.user.Roles
                                     },
                                     { headers: { 'x-auth-token': account.token } }
                                 )

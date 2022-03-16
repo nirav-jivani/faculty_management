@@ -31,7 +31,6 @@ router.post("/login", async (req, res) => {
 
       const token = jwt.sign({ user: user[0] }, JWT_SECRET);
       user[0][0].Roles = roles;
-      console.log(user[0][0]);
       data.user = user[0][0];
       data.token = token;
       data.msg = "";
@@ -67,6 +66,7 @@ router.post("/update-account", authenticateUser, async (req, res) => {
         where f.id=? `,
       [req.user.id]
     );
+    user[0][0].Roles = data.roles;
     res.json({ success: true, user: user[0][0] });
   } catch (err) {
     const data = { success: false, msg: "internal server Error" };

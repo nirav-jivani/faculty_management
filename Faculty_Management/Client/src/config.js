@@ -9,7 +9,14 @@ const config = {
     EVENT_TYPES: ['FDP', 'Workshop', 'Seminar', 'STTP', 'Conference', 'AnyOther'],
     EVENT_LEVELS: ['Local', 'National', 'International'],
     PUBLICATION_LEVELS: ['National', 'International'],
-    FILE_SIZE: 1048576
+    FILE_SIZE: 1048576,
+    EXPORTED_FILENAMES :  {
+        event_attended : 'event-attended',
+        event_conducted : 'event-conducted',
+        event_organized : 'event-organized',
+        reaserch_paper_conference : 'research-conference',
+        reaserch_paper_journal : 'research-journal',
+    }
 };
 
 export default config;
