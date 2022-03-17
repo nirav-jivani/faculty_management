@@ -113,7 +113,7 @@ const AddOrUpdateFaculty = (props, { ...others }) => {
                                     designation: values.designation,
                                     firstName: values.firstName,
                                     lastName: values.lastName,
-                                    initials : values.initials
+                                    initials: values.initials
                                 },
                                 { headers: { 'x-auth-token': account.token } }
                             )

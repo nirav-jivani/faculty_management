@@ -27,16 +27,15 @@ const useStyles = makeStyles((theme) => ({
 const Export = () => {
     return (
         <GridToolbarContainer>
-            <GridToolbarExport csvOptions = {{ allColumns: true, fileName : configData.EXPORTED_FILENAMES.event_organized }} />
+            <GridToolbarExport csvOptions={{ allColumns: true, fileName: configData.EXPORTED_FILENAMES.event_organized }} />
         </GridToolbarContainer>
     );
-}
+};
 
 const getType = (params) => {
-    if(params.row.EventType == "AnyOther")
-    return params.row.OtherType;
-    return params.row.EventType
-}
+    if (params.row.EventType == 'AnyOther') return params.row.OtherType;
+    return params.row.EventType;
+};
 
 const ViewEvents = (props, { ...others }) => {
     const classes = useStyles();
@@ -45,48 +44,48 @@ const ViewEvents = (props, { ...others }) => {
     const [events, setEvents] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState([]);
     const [isFileAvailable, setIsFileAvailable] = useState(false);
-    
+
     const history = useHistory();
-    
+
     const getEvents = () => {
         axios
-        .get(configData.API_SERVER + 'events/get-events-organized', {
-            headers: { 'x-auth-token': account.token }
-        })
-        .then((response) => {
-            setEvents(response.data);
-        });
+            .get(configData.API_SERVER + 'events/get-events-organized', {
+                headers: { 'x-auth-token': account.token }
+            })
+            .then((response) => {
+                setEvents(response.data);
+            });
     };
-    
+
     useEffect(() => {
         getEvents();
-    }, [events]);
-    
+    }, []);
+
     const onEditClick = () => {
         const event = events.find((e) => e.id === selectedEvent[0]);
         history.push({ pathname: '/event-organized/update-event', state: event, replace: true });
     };
-    
+
     const onDeleteClick = async () => {
         const event = events.find((e) => e.id === selectedEvent[0]);
         confirm({ description: `Event "${event.EventTitle}" will be permanently deleted.` }).then(() => {
             axios
-            .post(
-                configData.API_SERVER + 'events/delete-event-organized',
-                { id: selectedEvent[0] },
+                .post(
+                    configData.API_SERVER + 'events/delete-event-organized',
+                    { id: selectedEvent[0] },
                     {
                         headers: { 'x-auth-token': account.token }
                     }
-                    )
-                    .then((response) => {
+                )
+                .then((response) => {
                     if (response.data.success) {
-                        // setEvents((prev) => {
-                            //     return prev.filter((e) => e.id !== event.id);
-                            // });
-                            props.setAlertMessage('Deleted Successfully');
-                        }
-                    });
+                        setEvents((prev) => {
+                            return prev.filter((e) => e.id !== event.id);
+                        });
+                        props.setAlertMessage('Deleted Successfully');
+                    }
                 });
+        });
     };
 
     const onViewClick = () => {
@@ -101,7 +100,7 @@ const ViewEvents = (props, { ...others }) => {
             }
         });
     };
-    
+
     const columns = [
         { field: 'EventTitle', headerName: 'Title', flex: 1 },
         { field: 'EventTopic', headerName: 'Topic', flex: 1 },
@@ -114,14 +113,14 @@ const ViewEvents = (props, { ...others }) => {
         { field: 'EventLevel', headerName: 'Level', flex: 1, hide: true },
         { field: 'EventMode', headerName: 'Mode', flex: 1, hide: true },
         { field: 'ApprovedBy', headerName: 'Approved By', flex: 1, hide: true },
-        { field: 'AcademicYear', headerName: 'Academic Year', flex: 1 },
+        { field: 'AcademicYear', headerName: 'Academic Year', flex: 1 }
     ];
-    
+
     return (
         <MainCard
-        title="View Events (Organized)"
-        secondary={
-            <Stack direction="row" spacing={2} alignItems="center">
+            title="View Events (Organized)"
+            secondary={
+                <Stack direction="row" spacing={2} alignItems="center">
                     {selectedEvent.length > 0 && (
                         <>
                             {isFileAvailable && (
@@ -141,37 +140,39 @@ const ViewEvents = (props, { ...others }) => {
             }
         >
             <div style={{ height: 650, width: '100%', backgroundColor: 'white' }}>
-                <DataGrid
-                    components={{
-                        Toolbar: Export
-                    }}
-                    rows={events}
-                    className={classes.root}
-                    columns={columns}
-                    selectionModel={selectedEvent}
-                    textAlign="center"
-                    checkboxSelection
-                    hideFooterSelectedRowCount
-                    onSelectionModelChange={(selection) => {
-                        if (selection.length > 1) {
-                            const selectionSet = new Set(selectedEvent);
-                            const result = selection.filter((s) => !selectionSet.has(s));
-                            setSelectedEvent(result);
+                {events.length > 0 && (
+                    <DataGrid
+                        components={{
+                            Toolbar: Export
+                        }}
+                        rows={events}
+                        className={classes.root}
+                        columns={columns}
+                        selectionModel={selectedEvent}
+                        textAlign="center"
+                        checkboxSelection
+                        hideFooterSelectedRowCount
+                        onSelectionModelChange={(selection) => {
+                            if (selection.length > 1) {
+                                const selectionSet = new Set(selectedEvent);
+                                const result = selection.filter((s) => !selectionSet.has(s));
+                                setSelectedEvent(result);
 
-                            if (result.length !== 0) {
-                                const event = events.find((e) => e.id === result[0]);
-                                console.log(event);
-                                event.ProofPath !== '' ? setIsFileAvailable(true) : setIsFileAvailable(false);
+                                if (result.length !== 0) {
+                                    const event = events.find((e) => e.id === result[0]);
+                                    console.log(event);
+                                    event.ProofPath !== '' ? setIsFileAvailable(true) : setIsFileAvailable(false);
+                                }
+                            } else {
+                                if (selection.length !== 0) {
+                                    const event = events.find((e) => e.id === selection[0]);
+                                    event.ProofPath !== '' ? setIsFileAvailable(true) : setIsFileAvailable(false);
+                                }
+                                setSelectedEvent(selection);
                             }
-                        } else {
-                            if (selection.length !== 0) {
-                                const event = events.find((e) => e.id === selection[0]);
-                                event.ProofPath !== '' ? setIsFileAvailable(true) : setIsFileAvailable(false);
-                            }
-                            setSelectedEvent(selection);
-                        }
-                    }}
-                />
+                        }}
+                    />
+                )}
             </div>
         </MainCard>
     );

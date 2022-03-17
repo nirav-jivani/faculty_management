@@ -27,10 +27,10 @@ const useStyles = makeStyles((theme) => ({
 const Export = () => {
     return (
         <GridToolbarContainer>
-            <GridToolbarExport csvOptions = {{ allColumns: true, fileName : configData.EXPORTED_FILENAMES.reaserch_paper_conference }} />
+            <GridToolbarExport csvOptions={{ allColumns: true, fileName: configData.EXPORTED_FILENAMES.reaserch_paper_conference }} />
         </GridToolbarContainer>
     );
-}
+};
 
 const ViewConferences = (props) => {
     const classes = useStyles();
@@ -38,29 +38,29 @@ const ViewConferences = (props) => {
     const account = useSelector((state) => state.account);
     const [conferences, setConferences] = useState([]);
     const [selectedConference, setSelectedConference] = useState([]);
-    
+
     const history = useHistory();
-    
+
     const getConferences = () => {
         axios
-        .get(configData.API_SERVER + 'publications/get-conferences', {
-            headers: { 'x-auth-token': account.token }
-        })
-        .then((response) => {
-            setConferences(response.data);
-        });
+            .get(configData.API_SERVER + 'publications/get-conferences', {
+                headers: { 'x-auth-token': account.token }
+            })
+            .then((response) => {
+                setConferences(response.data);
+            });
     };
-    
+
     useEffect(() => {
         getConferences();
-    }, [conferences]);
-    
+    }, []);
+
     const onEditClick = () => {
         let conference = conferences.find((e) => e.id === selectedConference[0]);
         conference.type = 'Conference';
         history.push({ pathname: '/publications/edit-conference', state: conference, replace: true });
     };
-    
+
     const onDeleteClick = async () => {
         const conference = conferences.find((e) => e.id === selectedConference[0]);
         confirm({ description: `Conference "${conference.ConferenceTitle}" will be permanently deleted.` }).then(() => {
@@ -71,15 +71,16 @@ const ViewConferences = (props) => {
                     {
                         headers: { 'x-auth-token': account.token }
                     }
-                    )
-                    .then((response) => {
-                        if (response.data.success) {
-                            props.setAlertMessage('Deleted Successfully');
-                        }
-                    });
+                )
+                .then((response) => {
+                    if (response.data.success) {
+                        setConferences((prev) => prev.filter((e) => e.id !== conference.id));
+                        props.setAlertMessage('Deleted Successfully');
+                    }
+                });
         });
     };
-    
+
     const columns = [
         { field: 'ResearchTitle', headerName: 'Research Paper Title', flex: 1 },
         { field: 'Publisher', headerName: 'Punblisher', flex: 1 },
@@ -97,13 +98,13 @@ const ViewConferences = (props) => {
         { field: 'DOI', headerName: 'Digital Object Identifier', hide: true },
         { field: 'ISBN', headerName: 'ISBN/ISSN', hide: true },
         { field: 'AffiliatingInstitute', headerName: 'Affiliating Institute', hide: true },
-        { field: 'AcademicYear', headerName: 'Academic Year', flex: 1 },
+        { field: 'AcademicYear', headerName: 'Academic Year', flex: 1 }
     ];
-    
+
     return (
         <MainCard
-        title="View Conferences"
-        secondary={
+            title="View Conferences"
+            secondary={
                 <Stack direction="row" spacing={2} alignItems="center">
                     {selectedConference.length > 0 && (
                         <>
@@ -117,29 +118,31 @@ const ViewConferences = (props) => {
                     )}
                 </Stack>
             }
-            >
+        >
             <div style={{ height: 650, width: '100%', backgroundColor: 'white' }}>
-                <DataGrid
-                    components={{
-                        Toolbar: Export
-                    }}
-                    rows={conferences}
-                    className={classes.root}
-                    columns={columns}
-                    selectionModel={selectedConference}
-                    textAlign="center"
-                    checkboxSelection
-                    hideFooterSelectedRowCount
-                    onSelectionModelChange={(selection) => {
-                        if (selection.length > 1) {
-                            const selectionSet = new Set(selectedConference);
-                            const result = selection.filter((s) => !selectionSet.has(s));
-                            setSelectedConference(result);
-                        } else {
-                            setSelectedConference(selection);
-                        }
-                    }}
+                {conferences.length > 0 && (
+                    <DataGrid
+                        components={{
+                            Toolbar: Export
+                        }}
+                        rows={conferences}
+                        className={classes.root}
+                        columns={columns}
+                        selectionModel={selectedConference}
+                        textAlign="center"
+                        checkboxSelection
+                        hideFooterSelectedRowCount
+                        onSelectionModelChange={(selection) => {
+                            if (selection.length > 1) {
+                                const selectionSet = new Set(selectedConference);
+                                const result = selection.filter((s) => !selectionSet.has(s));
+                                setSelectedConference(result);
+                            } else {
+                                setSelectedConference(selection);
+                            }
+                        }}
                     />
+                )}
             </div>
         </MainCard>
     );
